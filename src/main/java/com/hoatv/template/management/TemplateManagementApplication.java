@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableAutoConfiguration
-@ComponentScan({"com.hoatv.template.management", "com.hoatv.springboot.common"})
+@ComponentScan({"com.hoatv.springboot.common", "com.hoatv.template.management"})
 public class TemplateManagementApplication {
 
     public static void main(String[] args) {

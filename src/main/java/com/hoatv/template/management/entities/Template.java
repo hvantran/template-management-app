@@ -41,7 +41,7 @@ public class Template {
     private Set<TemplateReport> templateReports = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "templateUUID")
-    private Set<DataTemplate> dataTemplates = new HashSet<>();
+    private Set<TemplateData> templateData = new HashSet<>();
 
     @PrePersist
     public void prePersist() {

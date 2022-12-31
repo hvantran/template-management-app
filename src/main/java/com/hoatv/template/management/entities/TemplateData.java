@@ -15,7 +15,7 @@ import java.util.UUID;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class DataTemplate {
+public class TemplateData {
 
     @Id
     @GeneratedValue(generator = "UUID")

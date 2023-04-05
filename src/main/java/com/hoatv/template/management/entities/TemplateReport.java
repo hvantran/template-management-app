@@ -5,7 +5,7 @@ import lombok.*;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;

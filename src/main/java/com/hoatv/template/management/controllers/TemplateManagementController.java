@@ -4,6 +4,7 @@ import com.hoatv.template.management.dtos.TemplateDTO;
 import com.hoatv.template.management.dtos.TemplateReportDTO;
 import com.hoatv.template.management.services.TemplateReportService;
 import com.hoatv.template.management.services.TemplateService;
+import jakarta.validation.Valid;
 import lombok.NonNull;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -11,7 +12,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController

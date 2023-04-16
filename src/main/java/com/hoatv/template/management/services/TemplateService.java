@@ -2,17 +2,16 @@ package com.hoatv.template.management.services;
 
 import com.hoatv.fwk.common.ultilities.ObjectUtils;
 import com.hoatv.monitor.mgmt.LoggingMonitor;
-import com.hoatv.template.management.dtos.DataTemplateDTO;
 import com.hoatv.template.management.dtos.TemplateDTO;
 import com.hoatv.template.management.dtos.TemplateReportDTO;
 import com.hoatv.template.management.entities.Template;
 import com.hoatv.template.management.repositories.TemplateRepository;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 

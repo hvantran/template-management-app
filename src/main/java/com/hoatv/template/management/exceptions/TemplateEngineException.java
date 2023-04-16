@@ -1,7 +1,5 @@
 package com.hoatv.template.management.exceptions;
 
-import com.hoatv.fwk.common.exceptions.AppException;
-
 public class TemplateEngineException extends Exception {
 
     public TemplateEngineException(String message) {

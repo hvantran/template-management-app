@@ -1,11 +1,11 @@
 package com.hoatv.template.management.entities;
 
 import com.hoatv.template.management.dtos.TemplateReportDTO;
+import jakarta.persistence.*;
 import lombok.*;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.hibernate.annotations.GenericGenerator;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;

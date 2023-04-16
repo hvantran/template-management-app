@@ -1,7 +1,6 @@
 package com.hoatv.template.management.dtos;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.hoatv.template.management.services.TemplateEngineEnum;
 import lombok.*;
 
 import java.time.LocalDateTime;

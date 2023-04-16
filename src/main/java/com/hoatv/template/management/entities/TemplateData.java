@@ -1,10 +1,10 @@
 package com.hoatv.template.management.entities;
 
 import com.hoatv.template.management.services.TemplateEngineEnum;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 

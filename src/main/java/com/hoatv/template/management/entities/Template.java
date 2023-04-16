@@ -1,10 +1,10 @@
 package com.hoatv.template.management.entities;
 
 import com.hoatv.template.management.dtos.TemplateDTO;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;

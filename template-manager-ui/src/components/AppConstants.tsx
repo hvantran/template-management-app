@@ -1,5 +1,6 @@
-export const TEMPLATE_BACKEND_URL: string = 'http://templateman.local:6087/template-manager/templates'
-export const TEMPLATE_REPORT_BACKEND_URL: string = 'http://templateman.local:6087/template-manager/templates/reports'
+export const TEMPLATE_BACKEND_URL: string = `${process.env.REACT_APP_TEMPLATE_MANAGER_BACKEND_URL}/template-manager/templates`
+export const TEMPLATE_REPORT_BACKEND_URL: string = `${process.env.REACT_APP_TEMPLATE_MANAGER_BACKEND_URL}/template-manager/templates/reports`
+
 export const ROOT_BREADCRUMB: string = 'Templates'
 
 export interface TemplateOverview {

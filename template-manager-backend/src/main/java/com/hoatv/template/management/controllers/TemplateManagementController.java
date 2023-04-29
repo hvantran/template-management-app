@@ -42,7 +42,7 @@ public class TemplateManagementController {
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TemplateDTO> updateTemplateByName(@RequestBody TemplateDTO templateDTO) {
-        TemplateDTO templateDTOOutput  = templateService.updateTemplateByName(templateDTO.getTemplateName(), templateDTO.getTemplateText());
+        TemplateDTO templateDTOOutput  = templateService.updateTemplateByName(templateDTO);
         return ResponseEntity.ok(templateDTOOutput);
     }
 

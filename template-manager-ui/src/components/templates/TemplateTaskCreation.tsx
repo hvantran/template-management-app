@@ -4,6 +4,7 @@ import { Stack } from '@mui/material';
 import LinkBreadcrumd from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { ROOT_BREADCRUMB, TEMPLATE_BACKEND_URL, TemplateReportMetadata } from '../AppConstants';
 import {
   PageEntityMetadata,
@@ -21,6 +22,10 @@ import PageEntityRender from '../renders/PageEntityRender';
 
 export default function TemplateTaskCreation() {
 
+  const location = useLocation();
+  let templateName = location.state?.template.templateName || '' ;
+  let dataTemplateJSON = location.state?.template.dataTemplateJSON || '{}' ;
+  let dsiableTemplateNameProp = location.state?.template.dsiableTemplateNameProp || false ;
   let initialStepsV3: Array<StepMetadata> = []
   const [openError, setOpenError] = React.useState(false);
   const [openSuccess, setOpenSuccess] = React.useState(false);
@@ -38,8 +43,9 @@ export default function TemplateTaskCreation() {
         {
           propName: 'templateName',
           propLabel: 'Target template name',
-          propValue: '',
+          propValue: templateName,
           isRequired: true,
+          disabled: dsiableTemplateNameProp,
           layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
           labelElementProperties: { xs: 4 },
           valueElementProperties: { xs: 8 },
@@ -79,8 +85,7 @@ export default function TemplateTaskCreation() {
         {
           propName: 'templateData',
           propLabel: 'Template data',
-          propValue: '',
-          propDefaultValue: '',
+          propValue: dataTemplateJSON,
           layoutProperties: { xs: 12 },
           labelElementProperties: { xs: 2 },
           valueElementProperties: { xs: 10 },

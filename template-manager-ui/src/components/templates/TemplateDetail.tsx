@@ -6,7 +6,6 @@ import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import React from 'react';
 import {
-  ActionMetadata,
   GenericActionMetadata,
   PageEntityMetadata,
   PropType,
@@ -18,12 +17,14 @@ import {
 import ProcessTracking from '../common/ProcessTracking';
 
 import { javascript } from '@codemirror/lang-javascript';
-import { useNavigate, useParams } from 'react-router-dom';
+import EditIcon from '@mui/icons-material/Edit';
+import SaveIcon from '@mui/icons-material/Save';
+import AddTaskIcon from '@mui/icons-material/AddTask';
+import { NavigateOptions, useNavigate, useParams } from 'react-router-dom';
 import { ROOT_BREADCRUMB, TEMPLATE_BACKEND_URL, TemplateMetadata, TemplateOverview } from '../AppConstants';
 import SnackbarAlert from '../common/SnackbarAlert';
 import PageEntityRender from '../renders/PageEntityRender';
-import EditIcon from '@mui/icons-material/Edit';
-import SaveIcon from '@mui/icons-material/Save';
+import { json } from '@codemirror/lang-json';
 
 
 
@@ -54,6 +55,29 @@ export default function TemplateDetails() {
           let propName = event.target.name;
 
           setPropertyMetadata(onChangeProperty(propName, propValue));
+        }
+      }
+    },
+    {
+      propName: 'dataTemplateJSON',
+      propLabel: 'Data template',
+      propValue: '',
+      disabled: true,
+      propDefaultValue: '',
+      layoutProperties: { xs: 12 },
+      labelElementProperties: { xs: 2 },
+      valueElementProperties: { xs: 10 },
+      isRequired: true,
+      propType: PropType.CodeEditor,
+      codeEditorMeta:
+      {
+        height: "200px",
+        codeLanguges: [json()],
+        onChangeEvent: function (propName) {
+          return (value, _) => {
+            let propValue = value;
+            setPropertyMetadata(onChangeProperty(propName, propValue))
+          }
         }
       }
     },
@@ -153,9 +177,11 @@ export default function TemplateDetails() {
 
     let templateName = propertyMetadata.find(p => p.propName === "templateName")?.propValue;
     let templateText = propertyMetadata.find(p => p.propName === "templateText")?.propValue;
+    let dataTemplateJSON = propertyMetadata.find(p => p.propName === "dataTemplateJSON")?.propValue;
     let templateMetadata: TemplateMetadata = {
       templateName,
-      templateText
+      templateText,
+      dataTemplateJSON
     }
     const requestOptions = {
       method: "PUT",
@@ -191,7 +217,16 @@ export default function TemplateDetails() {
         onClick: () => () => loadTemplateAsync(templateName)
       },
       editActionMeta,
-      saveActionMeta
+      saveActionMeta,
+      {
+        actionIcon: <AddTaskIcon />,
+        actionLabel: "Add Template Task",
+        actionName: "addTaskAction",
+        onClick: () => () => {
+          let dataTemplateProperty = findPropertyMetadata("dataTemplateJSON");
+          navigate("/tasks/new", {state: {template: {templateName, dataTemplateJSON: dataTemplateProperty?.propValue, dsiableTemplateNameProp: true}}})
+        }
+      }
     ],
     properties: propertyMetadata
   }
@@ -205,6 +240,10 @@ export default function TemplateDetails() {
         return prop;
       });
     };
+  }
+
+  function findPropertyMetadata(propName: string):PropertyMetadata | undefined {
+    return propertyMetadata.find(p => p.propName === propName);
   }
 
   let snackbarAlertMetadata: SnackbarAlertMetadata = {

@@ -60,6 +60,28 @@ export default function TemplateCreation() {
           }
         },
         {
+          propName: 'dataTemplateJSON',
+          propLabel: 'Data template',
+          propValue: '{}',
+          propDefaultValue: '{}',
+          layoutProperties: { xs: 12 },
+          labelElementProperties: { xs: 2 },
+          valueElementProperties: { xs: 10 },
+          isRequired: true,
+          propType: PropType.CodeEditor,
+          codeEditorMeta:
+          {
+            height: "200px",
+            codeLanguges: [json()],
+            onChangeEvent: function (propName) {
+              return (value, _) => {
+                let propValue = value;
+                setStepMetadatas(onchangeStepDefault(propName, propValue))
+              }
+            }
+          }
+        },
+        {
           propName: 'templateText',
           propLabel: 'Template content',
           propValue: '',
@@ -123,7 +145,8 @@ export default function TemplateCreation() {
       
       let templateName = findStepPropertyByCondition(templateMetadataMetadata, property => property.propName.startsWith("templateName"))?.propValue;
       let templateText = findStepPropertyByCondition(templateMetadataMetadata, property => property.propName.startsWith("templateText"))?.propValue;
-      return {templateName, templateText}
+      let dataTemplateJSON = findStepPropertyByCondition(templateMetadataMetadata, property => property.propName.startsWith("dataTemplateJSON"))?.propValue;
+      return {templateName, templateText, dataTemplateJSON}
     }
 
     return getTemplateMetadata();

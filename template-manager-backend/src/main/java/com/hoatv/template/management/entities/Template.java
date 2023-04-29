@@ -31,6 +31,10 @@ public class Template {
     @Column
     private String templateText;
 
+    @Lob
+    @Column
+    private String dataTemplateJSON;
+
     @Column
     private Long createdAt;
 
@@ -58,6 +62,7 @@ public class Template {
                 .uuid(this.uuid.toString())
                 .templateName(this.templateName)
                 .templateText(this.templateText)
+                .dataTemplateJSON(this.dataTemplateJSON)
                 .createdAt(this.createdAt)
                 .updatedAt(this.updatedAt)
                 .build();
@@ -67,6 +72,7 @@ public class Template {
         return Template.builder()
                 .templateName(templateDTO.getTemplateName())
                 .templateText(templateDTO.getTemplateText())
+                .dataTemplateJSON(templateDTO.getDataTemplateJSON())
                 .build();
     }
 }

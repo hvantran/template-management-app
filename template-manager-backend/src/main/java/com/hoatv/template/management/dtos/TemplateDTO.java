@@ -17,6 +17,8 @@ public class TemplateDTO {
 
     private String templateText;
 
+    private String dataTemplateJSON;
+
     private Long createdAt;
 
     private Long updatedAt;

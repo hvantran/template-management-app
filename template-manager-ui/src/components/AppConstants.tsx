@@ -6,6 +6,7 @@ export const ROOT_BREADCRUMB: string = 'Templates'
 export interface TemplateOverview {
     uuid: string
     templateName: string
+    dataTemplateJSON: string
     templateText: string
     createdAt: number
     updatedAt: number
@@ -13,7 +14,8 @@ export interface TemplateOverview {
 
 export interface TemplateMetadata {
     templateName: string,
-    templateText: string
+    templateText: string,
+    dataTemplateJSON: string
 }
 
 export interface TemplateReportOverview {

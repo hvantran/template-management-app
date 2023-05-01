@@ -4,7 +4,7 @@ import { Stack } from '@mui/material';
 import LinkBreadcrumd from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ROOT_BREADCRUMB, TEMPLATE_BACKEND_URL, TemplateReportMetadata } from '../AppConstants';
 import {
   PageEntityMetadata,
@@ -23,6 +23,7 @@ import PageEntityRender from '../renders/PageEntityRender';
 export default function TemplateTaskCreation() {
 
   const location = useLocation();
+  const navigate = useNavigate();
   let templateName = location.state?.template.templateName || '' ;
   let dataTemplateJSON = location.state?.template.dataTemplateJSON || '{}' ;
   let dsiableTemplateNameProp = location.state?.template.dsiableTemplateNameProp || false ;
@@ -119,9 +120,10 @@ export default function TemplateTaskCreation() {
         };
 
         const targetURL = `${TEMPLATE_BACKEND_URL}/${encodeURIComponent(templateMetadata.templateName)}/process-data?engine=${templateMetadata.templateEngine}`;
-        await restClient.sendRequest(requestOptions, targetURL, async () => {
-          let message = `Template ${templateMetadata.templateName} is created`;
-          return { 'message': message, key: new Date().getTime() } as SnackbarMessage;
+        await restClient.sendRequest(requestOptions, targetURL, async (response) => {
+          let responseJSON = await response.json();
+          navigate(`/tasks/${responseJSON["reportId"]}`)
+          return undefined;
         }, async (response: Response) => {
           return { 'message': "An interal error occurred during your request!", key: new Date().getTime() } as SnackbarMessage;
         });
@@ -157,7 +159,7 @@ export default function TemplateTaskCreation() {
     pageName: 'templatReporteMetadata-creation',
     breadcumbsMeta: [
       <LinkBreadcrumd underline="hover" key="1" color="inherit" href="/tasks">
-        {ROOT_BREADCRUMB}
+        Tasks
       </LinkBreadcrumd>,
       <Typography key="3" color="text.primary">new</Typography>
     ],

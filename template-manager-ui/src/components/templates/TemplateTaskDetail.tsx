@@ -45,6 +45,7 @@ export default function TemplateTaskDetails() {
       propType: PropType.CodeEditor,
       codeEditorMeta:
       {
+        height: "700px",
         codeLanguges: [javascript({ jsx: true })],
         onChangeEvent: function (propName) {
           return (value, _) => {

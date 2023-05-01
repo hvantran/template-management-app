@@ -5,9 +5,11 @@ import com.hoatv.template.management.dtos.TemplateReportDTO;
 import com.hoatv.template.management.services.TemplateReportService;
 import com.hoatv.template.management.services.TemplateService;
 import jakarta.validation.Valid;
+import java.util.Map;
 import lombok.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +38,9 @@ public class TemplateManagementController {
 
     @GetMapping
     public ResponseEntity<?> getAllTemplates(@RequestParam int pageIndex, @RequestParam int pageSize) {
-        Page<TemplateDTO> templateDTOList = templateService.getAllTemplates(PageRequest.of(pageIndex, pageSize));
+        Sort defaultSorting = Sort.by(Sort.Order.desc("createdAt"));
+        Page<TemplateDTO> templateDTOList =
+                templateService.getAllTemplates(PageRequest.of(pageIndex, pageSize, defaultSorting));
         return ResponseEntity.ok(templateDTOList);
     }
 
@@ -52,15 +56,19 @@ public class TemplateManagementController {
         return ResponseEntity.ok(templateDTO);
     }
 
-    @PostMapping(value = "/{template-name}/process-data", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
-    public ResponseEntity<String> processTemplate(@NonNull @PathVariable("template-name") String templateName, @RequestParam String engine, @Valid @RequestBody String dataTemplateJson) {
+    @PostMapping(value = "/{template-name}/process-data", consumes = MediaType.TEXT_PLAIN_VALUE)
+    public ResponseEntity<?> processTemplate(@NonNull @PathVariable("template-name") String templateName,
+                                                  @RequestParam String engine,
+                                                  @Valid @RequestBody String dataTemplateJson) {
         TemplateReportDTO templateReportDTO = templateService.processTemplate(templateName, engine, dataTemplateJson);
-        return ResponseEntity.ok(templateReportDTO.getOutputReportText());
+        return ResponseEntity.ok(Map.of("reportId", templateReportDTO.getUuid()));
     }
 
     @GetMapping(value = "/reports")
     public ResponseEntity<?> getTemplateReportDetails(@RequestParam int pageIndex, @RequestParam int pageSize) {
-        Page<TemplateReportDTO> templateReportDetails = templateReportService.getTemplateReportDetails(PageRequest.of(pageIndex, pageSize));
+        Sort defaultSorting = Sort.by(Sort.Order.desc("startedAt"));
+        Page<TemplateReportDTO> templateReportDetails =
+                templateReportService.getTemplateReportDetails(PageRequest.of(pageIndex, pageSize, defaultSorting));
         return ResponseEntity.ok(templateReportDetails);
     }
 

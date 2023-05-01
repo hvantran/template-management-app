@@ -18,10 +18,15 @@ import ProcessTracking from '../common/ProcessTracking';
 import SnackbarAlert from '../common/SnackbarAlert';
 import PageEntityRender from '../renders/PageEntityRender';
 import { javascript } from '@codemirror/lang-javascript';
+import { useLocation } from 'react-router-dom';
 
 
 export default function TemplateCreation() {
 
+  const location = useLocation();
+  let templateName = location.state?.template.templateName || '' ;
+  let dataTemplateJSON = location.state?.template.dataTemplateJSON || '{}' ;
+  let templateText = location.state?.template.templateContent || '{}' ;
   let initialStepsV3: Array<StepMetadata> = []
   const [openError, setOpenError] = React.useState(false);
   const [openSuccess, setOpenSuccess] = React.useState(false);
@@ -39,7 +44,7 @@ export default function TemplateCreation() {
         {
           propName: 'templateName',
           propLabel: 'Template name',
-          propValue: '',
+          propValue: templateName,
           isRequired: true,
           layoutProperties: { xs: 12, alignItems: "center", justifyContent: "center" },
           labelElementProperties: { xs: 2 },
@@ -62,7 +67,7 @@ export default function TemplateCreation() {
         {
           propName: 'dataTemplateJSON',
           propLabel: 'Data template',
-          propValue: '{}',
+          propValue: dataTemplateJSON,
           propDefaultValue: '{}',
           layoutProperties: { xs: 12 },
           labelElementProperties: { xs: 2 },
@@ -84,7 +89,7 @@ export default function TemplateCreation() {
         {
           propName: 'templateText',
           propLabel: 'Template content',
-          propValue: '',
+          propValue: templateText,
           propDefaultValue: '',
           layoutProperties: { xs: 12 },
           labelElementProperties: { xs: 2 },

@@ -17,14 +17,16 @@ import {
 import ProcessTracking from '../common/ProcessTracking';
 
 import { javascript } from '@codemirror/lang-javascript';
+import { json } from '@codemirror/lang-json';
+import AddTaskIcon from '@mui/icons-material/AddTask';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
-import AddTaskIcon from '@mui/icons-material/AddTask';
-import { NavigateOptions, useNavigate, useParams } from 'react-router-dom';
+import FileCopyIcon from '@mui/icons-material/FileCopy';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ROOT_BREADCRUMB, TEMPLATE_BACKEND_URL, TemplateMetadata, TemplateOverview } from '../AppConstants';
 import SnackbarAlert from '../common/SnackbarAlert';
 import PageEntityRender from '../renders/PageEntityRender';
-import { json } from '@codemirror/lang-json';
+import { green, grey } from '@mui/material/colors';
 
 
 
@@ -35,6 +37,27 @@ export default function TemplateDetails() {
   const templateName: string | undefined = targetTemplate.templateName;
   if (!templateName) {
     throw new Error("Template is required");
+  }
+
+
+  const enableEditFunction = function(isEnabled: boolean) {
+
+    setEditActionMeta(previous => {
+      previous.disable = isEnabled;
+      return previous;
+    })
+    setSaveActionMeta(previous => {
+      previous.disable = !isEnabled;
+      return previous;
+    });
+    setPropertyMetadata(previous => {
+      return [...previous].map(p => {
+        if (p.propName !== "templateName") {
+          p.disabled = !isEnabled;
+        }
+        return p;
+      })
+    })
   }
 
   const [propertyMetadata, setPropertyMetadata] = React.useState<Array<PropertyMetadata>>([
@@ -118,30 +141,12 @@ export default function TemplateDetails() {
         putTemplateAsync();
       }
     });
-
   const [editActionMeta, setEditActionMeta] = React.useState<GenericActionMetadata>(
     {
       actionIcon: <EditIcon />,
       actionLabel: "Edit",
       actionName: "editAction",
-      onClick: () => () => {
-        setEditActionMeta(previous => {
-          previous.disable = true;
-          return previous;
-        })
-        setSaveActionMeta(previous => {
-          previous.disable = false;
-          return previous;
-        });
-        setPropertyMetadata(previous => {
-          return [...previous].map(p => {
-            if (p.propName !== "templateName") {
-              p.disabled = false;
-            }
-            return p;
-          })
-        })
-      }
+      onClick: () => () => enableEditFunction(true)
     });
   const breadcrumbs = [
     <Link underline="hover" key="1" color="inherit" href='/templates'>
@@ -193,9 +198,10 @@ export default function TemplateDetails() {
     }
 
     const targetURL = `${TEMPLATE_BACKEND_URL}`;
-    await restClient.sendRequest(requestOptions, targetURL, () => {
-      navigate("/templates")
-      return undefined;
+    await restClient.sendRequest(requestOptions, targetURL, async(response) => {
+      let responseJSON = await response.json();
+      enableEditFunction(false);
+      return { 'message': `${responseJSON['uuid']} is updated`, key: new Date().getTime() } as SnackbarMessage;
     }, async (response: Response) => {
       let responseJSON = await response.json();
       return { 'message': responseJSON['message'], key: new Date().getTime() } as SnackbarMessage;
@@ -220,13 +226,31 @@ export default function TemplateDetails() {
       saveActionMeta,
       {
         actionIcon: <AddTaskIcon />,
+        properties: { sx: { color: green[800] } },
         actionLabel: "Add Template Task",
         actionName: "addTaskAction",
         onClick: () => () => {
           let dataTemplateProperty = findPropertyMetadata("dataTemplateJSON");
           navigate("/tasks/new", {state: {template: {templateName, dataTemplateJSON: dataTemplateProperty?.propValue, dsiableTemplateNameProp: true}}})
         }
-      }
+      },
+      {
+        actionIcon: <FileCopyIcon />,
+        properties: { sx: { color: grey[800] } },
+        actionLabel: "Clone Temmplate",
+        actionName: "cloneTemplate",
+        onClick: () => () => {
+          let dataTemplateProperty = findPropertyMetadata("dataTemplateJSON");
+          let templateContentProperty = findPropertyMetadata("templateText");
+
+          navigate("/templates/new", {state: {template: {
+            templateName: templateName + "-Copy", 
+            dataTemplateJSON: dataTemplateProperty?.propValue, 
+            templateContent: templateContentProperty?.propValue
+          }}})
+        }
+      },
+      
     ],
     properties: propertyMetadata
   }

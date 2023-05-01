@@ -1,13 +1,15 @@
 
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
+import FileCopyIcon from '@mui/icons-material/FileCopy';
 import ReadMoreIcon from '@mui/icons-material/ReadMore';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import AddTaskIcon from '@mui/icons-material/AddTask';
 
 import { Stack } from '@mui/material';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
-import { green, red } from '@mui/material/colors';
+import { green, red, grey } from '@mui/material/colors';
 import React from 'react';
 import {
   ColumnMetadata,
@@ -24,10 +26,10 @@ import {
 import ProcessTracking from '../common/ProcessTracking';
 
 import { useNavigate } from 'react-router-dom';
-import { TEMPLATE_BACKEND_URL, TemplateOverview, ROOT_BREADCRUMB } from '../AppConstants';
+import { TEMPLATE_BACKEND_URL, TemplateOverview, ROOT_BREADCRUMB} from '../AppConstants';
 import SnackbarAlert from '../common/SnackbarAlert';
-import PageEntityRender from '../renders/PageEntityRender';
 import TextTruncate from '../common/TextTruncate';
+import PageEntityRender from '../renders/PageEntityRender';
 
 
 
@@ -94,7 +96,7 @@ export default function TemplateSummary() {
     {
       id: 'actions',
       label: '',
-      minWidth: 100,
+      minWidth: 200,
       align: 'right',
       actions: [
         {
@@ -104,6 +106,35 @@ export default function TemplateSummary() {
           onClick: (row: TemplateOverview) => {
             return () => navigate(`/templates/${row.templateName}`)
           }
+        },
+        {
+          actionIcon: <AddTaskIcon />,
+          properties: { sx: { color: green[800] } },
+          actionLabel: "Add Template Task",
+          actionName: "addTaskAction",
+          onClick: (row: TemplateOverview) => {
+            return () => {
+            navigate("/tasks/new", {state: {template: {
+              templateName: row.templateName,
+               dataTemplateJSON: row.dataTemplateJSON,
+                dsiableTemplateNameProp: true
+              }}})
+            }
+          }
+        },
+        {
+          actionIcon: <FileCopyIcon />,
+          properties: { sx: { color: grey[800] } },
+          actionLabel: "Clone Temmplate",
+          actionName: "cloneTemplate",
+          onClick: (row: TemplateOverview) => {
+            return () => {
+              navigate("/templates/new", {state: {template: {
+                templateName: row.templateName + "-Copy", 
+                dataTemplateJSON: row.dataTemplateJSON, 
+                templateContent: row.templateText
+              }}})
+          }}
         },
         {
           actionIcon: <DeleteIcon />,

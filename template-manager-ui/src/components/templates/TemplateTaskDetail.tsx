@@ -1,5 +1,6 @@
 
 import RefreshIcon from '@mui/icons-material/Refresh';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 import { Stack } from '@mui/material';
 import Link from '@mui/material/Link';
@@ -20,6 +21,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { TEMPLATE_BACKEND_URL } from '../AppConstants';
 import SnackbarAlert from '../common/SnackbarAlert';
 import PageEntityRender from '../renders/PageEntityRender';
+import { green } from '@mui/material/colors';
 
 
 
@@ -60,6 +62,7 @@ export default function TemplateTaskDetails() {
   const [openSuccess, setOpenSuccess] = React.useState(false);
   const [messageInfo, setMessageInfo] = React.useState<SnackbarMessage | undefined>(undefined);
   const restClient = new RestClient(setCircleProcessOpen, setMessageInfo, setOpenError, setOpenSuccess);
+
   const breadcrumbs = [
     <Link underline="hover" key="1" color="inherit" href='/tasks'>
       Tasks
@@ -96,6 +99,18 @@ export default function TemplateTaskDetails() {
     breadcumbsMeta: breadcrumbs,
     pageEntityActions: [
       {
+        actionIcon: <ContentCopyIcon />,
+        properties: { sx: { color: green[800] } },
+        actionLabel: "Copy to clipboard",
+        actionName: "copyToClipboard",
+        onClick: () => () => {
+          let outputReportText = findPropertyMetadata("outputReportText")
+          navigator.clipboard.writeText(outputReportText?.propValue);
+          setMessageInfo({ 'message': 'Content is copied', key: new Date().getTime() } as SnackbarMessage);
+          setOpenSuccess(true)
+        }
+      },
+      {
         actionIcon: <RefreshIcon />,
         actionLabel: "Refresh",
         actionName: "refreshAction",
@@ -114,6 +129,11 @@ export default function TemplateTaskDetails() {
         return prop;
       });
     };
+  }
+
+
+  function findPropertyMetadata(propName: string):PropertyMetadata | undefined {
+    return propertyMetadata.find(p => p.propName === propName);
   }
 
   let snackbarAlertMetadata: SnackbarAlertMetadata = {

@@ -1,6 +1,6 @@
 
-import RefreshIcon from '@mui/icons-material/Refresh';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 import { Stack } from '@mui/material';
 import Link from '@mui/material/Link';
@@ -17,11 +17,11 @@ import {
 import ProcessTracking from '../common/ProcessTracking';
 
 import { javascript } from '@codemirror/lang-javascript';
-import { useNavigate, useParams } from 'react-router-dom';
+import { green } from '@mui/material/colors';
+import { useParams } from 'react-router-dom';
 import { TEMPLATE_BACKEND_URL } from '../AppConstants';
 import SnackbarAlert from '../common/SnackbarAlert';
 import PageEntityRender from '../renders/PageEntityRender';
-import { green } from '@mui/material/colors';
 
 
 

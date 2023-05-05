@@ -1,10 +1,12 @@
 import { json } from '@codemirror/lang-json';
 import { Stack } from '@mui/material';
 
+import { javascript } from '@codemirror/lang-javascript';
 import LinkBreadcrumd from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import React from 'react';
-import { TEMPLATE_BACKEND_URL, TemplateOverview, ROOT_BREADCRUMB, TemplateMetadata } from '../AppConstants';
+import { useLocation } from 'react-router-dom';
+import { ROOT_BREADCRUMB, TEMPLATE_BACKEND_URL, TemplateMetadata } from '../AppConstants';
 import {
   PageEntityMetadata,
   PropType,
@@ -17,8 +19,6 @@ import {
 import ProcessTracking from '../common/ProcessTracking';
 import SnackbarAlert from '../common/SnackbarAlert';
 import PageEntityRender from '../renders/PageEntityRender';
-import { javascript } from '@codemirror/lang-javascript';
-import { useLocation } from 'react-router-dom';
 
 
 export default function TemplateCreation() {

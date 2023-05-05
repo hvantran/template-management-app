@@ -5,7 +5,7 @@ import LinkBreadcrumd from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ROOT_BREADCRUMB, TEMPLATE_BACKEND_URL, TemplateReportMetadata } from '../AppConstants';
+import { TEMPLATE_BACKEND_URL, TemplateReportMetadata } from '../AppConstants';
 import {
   PageEntityMetadata,
   PropType,

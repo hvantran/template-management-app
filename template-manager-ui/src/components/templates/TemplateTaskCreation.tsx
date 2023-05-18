@@ -13,7 +13,8 @@ import {
   RestClient,
   SnackbarAlertMetadata,
   SnackbarMessage,
-  StepMetadata
+  StepMetadata,
+  onchangeStepDefault
 } from '../GenericConstants';
 import ProcessTracking from '../common/ProcessTracking';
 import SnackbarAlert from '../common/SnackbarAlert';
@@ -184,27 +185,4 @@ export default function TemplateTaskCreation() {
       <SnackbarAlert {...snackbarAlertMetadata}></SnackbarAlert>
     </Stack>
   );
-
-  function onchangeStepDefault(propName: string, propValue: any, stepMetadataCallback?: (stepMetadata: StepMetadata) => void,
-    propertyCallback?: (property: PropertyMetadata) => void): React.SetStateAction<StepMetadata[]> {
-    return previous => {
-      return [...previous].map((stepMetadata) => {
-        let properties = stepMetadata.properties.map(prop => {
-          if (prop.propName === propName) {
-            prop.propValue = propValue;
-          }
-          if (propertyCallback) {
-            propertyCallback(prop);
-          }
-          return prop;
-        });
-
-        stepMetadata.properties = properties;
-        if (stepMetadataCallback) {
-          stepMetadataCallback(stepMetadata);
-        }
-        return stepMetadata;
-      });
-    };
-  }
 }

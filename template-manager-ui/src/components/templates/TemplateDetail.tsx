@@ -12,7 +12,8 @@ import {
   PropertyMetadata,
   RestClient,
   SnackbarAlertMetadata,
-  SnackbarMessage
+  SnackbarMessage,
+  onChangeProperty
 } from '../GenericConstants';
 import ProcessTracking from '../common/ProcessTracking';
 
@@ -253,17 +254,6 @@ export default function TemplateDetails() {
       
     ],
     properties: propertyMetadata
-  }
-
-  function onChangeProperty(propName: string, propValue: any): React.SetStateAction<PropertyMetadata[]> {
-    return previous => {
-      return [...previous].map((prop) => {
-        if (prop.propName === propName) {
-          prop.propValue = propValue;
-        }
-        return prop;
-      });
-    };
   }
 
   function findPropertyMetadata(propName: string):PropertyMetadata | undefined {

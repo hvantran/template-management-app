@@ -29,7 +29,6 @@ export default function PageRender(props: PageEntityMetadata) {
                         color="primary"
                         aria-label="Next"
                         component="label"
-                        disabled={action.disable}
 
                         {...action.properties}>
                         <Tooltip
@@ -58,7 +57,6 @@ export default function PageRender(props: PageEntityMetadata) {
                         color="primary"
                         aria-label="Next"
                         component="label"
-                        disabled={action.disable}
 
                         {...action.properties}>
                         <Tooltip title={action.actionLabel}>
@@ -73,7 +71,7 @@ export default function PageRender(props: PageEntityMetadata) {
     if (propertiesMetadata) {
         nodes.push((
             <Box sx={{ px: '100px' }}>
-                <Grid spacing={2} sx={{ py: 1 }}>
+                <Grid container spacing={2} sx={{ py: 1 }}>
                     {propertiesMetadata
                         .map((propertyMeta, index) => {
                             return (

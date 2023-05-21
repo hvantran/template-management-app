@@ -138,7 +138,7 @@ export default function TemplateDetails() {
       actionLabel: "Save",
       actionName: "saveAction",
       disable: true,
-      onClick: () => () => {
+      onClick: ()  => {
         putTemplateAsync();
       }
     });
@@ -147,7 +147,7 @@ export default function TemplateDetails() {
       actionIcon: <EditIcon />,
       actionLabel: "Edit",
       actionName: "editAction",
-      onClick: () => () => enableEditFunction(true)
+      onClick: ()  => enableEditFunction(true)
     });
   const breadcrumbs = [
     <Link underline="hover" key="1" color="inherit" href='/templates'>
@@ -221,7 +221,7 @@ export default function TemplateDetails() {
         actionIcon: <RefreshIcon />,
         actionLabel: "Refresh",
         actionName: "refreshAction",
-        onClick: () => () => loadTemplateAsync(templateName)
+        onClick: ()  => loadTemplateAsync(templateName)
       },
       editActionMeta,
       saveActionMeta,
@@ -230,7 +230,7 @@ export default function TemplateDetails() {
         properties: { sx: { color: green[800] } },
         actionLabel: "Add Template Task",
         actionName: "addTaskAction",
-        onClick: () => () => {
+        onClick: ()  => {
           let dataTemplateProperty = findPropertyMetadata("dataTemplateJSON");
           navigate("/tasks/new", {state: {template: {templateName, dataTemplateJSON: dataTemplateProperty?.propValue, dsiableTemplateNameProp: true}}})
         }
@@ -240,7 +240,7 @@ export default function TemplateDetails() {
         properties: { sx: { color: grey[800] } },
         actionLabel: "Clone Temmplate",
         actionName: "cloneTemplate",
-        onClick: () => () => {
+        onClick: ()  => {
           let dataTemplateProperty = findPropertyMetadata("dataTemplateJSON");
           let templateContentProperty = findPropertyMetadata("templateText");
 

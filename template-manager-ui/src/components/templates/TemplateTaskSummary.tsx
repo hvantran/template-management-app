@@ -178,7 +178,7 @@ export default function TemplateTaskSummary() {
         actionIcon: <RefreshIcon />,
         actionLabel: "Refresh templates",
         actionName: "refreshAction",
-        onClick: () => () => loadTemplateReportSummaryAsync(pageIndex, pageSize)
+        onClick: ()  => loadTemplateReportSummaryAsync(pageIndex, pageSize)
       }
     ]
   }

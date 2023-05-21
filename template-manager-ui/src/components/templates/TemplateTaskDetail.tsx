@@ -104,7 +104,7 @@ export default function TemplateTaskDetails() {
         properties: { sx: { color: green[800] } },
         actionLabel: "Copy to clipboard",
         actionName: "copyToClipboard",
-        onClick: () => () => {
+        onClick: ()  => {
           let outputReportText = findPropertyMetadata("outputReportText")
           navigator.clipboard.writeText(outputReportText?.propValue);
           setMessageInfo({ 'message': 'Content is copied', key: new Date().getTime() } as SnackbarMessage);
@@ -115,7 +115,7 @@ export default function TemplateTaskDetails() {
         actionIcon: <RefreshIcon />,
         actionLabel: "Refresh",
         actionName: "refreshAction",
-        onClick: () => () => loadTemplateAsync(taskId)
+        onClick: ()  => loadTemplateAsync(taskId)
       }
     ],
     properties: propertyMetadata

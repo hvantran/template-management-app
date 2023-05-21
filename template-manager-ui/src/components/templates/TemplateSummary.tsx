@@ -13,6 +13,7 @@ import { green, red, grey } from '@mui/material/colors';
 import React from 'react';
 import {
   ColumnMetadata,
+  DataTypeDisplayer,
   PageEntityMetadata,
   PagingOptionMetadata,
   PagingResult,
@@ -68,30 +69,14 @@ export default function TemplateSummary() {
       label: 'Created at',
       minWidth: 170,
       align: 'left',
-      format: (value: number) => {
-
-        if (!value) {
-          return "";
-        }
-
-        let createdAtDate = new Date(value);
-        return createdAtDate.toString();
-      }
+      format: DataTypeDisplayer.formatDate
     },
     {
       id: 'updatedAt',
       label: 'Updated at',
       minWidth: 170,
       align: 'left',
-      format: (value: number) => {
-
-        if (!value) {
-          return "";
-        }
-
-        let createdAtDate = new Date(value);
-        return createdAtDate.toString();
-      }
+      format: DataTypeDisplayer.formatDate
     },
     {
       id: 'actions',
@@ -231,7 +216,7 @@ export default function TemplateSummary() {
         actionIcon: <RefreshIcon />,
         actionLabel: "Refresh templates",
         actionName: "refreshAction",
-        onClick: () => () => loadTemplateSummaryAsync(pageIndex, pageSize)
+        onClick: ()  => loadTemplateSummaryAsync(pageIndex, pageSize)
       }
     ]
   }

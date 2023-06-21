@@ -76,7 +76,7 @@ export default function TemplateTaskCreation() {
           valueElementProperties: { xs: 8 },
           propType: PropType.Selection,
           selectionMeta: {
-            selections: ["freemarker"],
+            selections: [{label: "freemarker", value: 'freemarker'}],
             onChangeEvent: function (event) {
               let propValue = event.target.value;
               let propName = event.target.name;

@@ -42,7 +42,7 @@ export default function TemplateTaskDetails() {
       propDefaultValue: '',
       disabled: true,
       layoutProperties: { xs: 12 },
-      labelElementProperties: { xs: 2 },
+      labelElementProperties: { xs: 2,  sx: { pl: 10 } },
       valueElementProperties: { xs: 10 },
       isRequired: true,
       propType: PropType.CodeEditor,

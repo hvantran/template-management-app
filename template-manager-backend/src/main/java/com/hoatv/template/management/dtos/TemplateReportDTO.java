@@ -3,8 +3,6 @@ package com.hoatv.template.management.dtos;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Builder
 @ToString

@@ -21,9 +21,9 @@ import java.util.Map;
 @RequestMapping(value = "/templates", produces = MediaType.APPLICATION_JSON_VALUE)
 public class TemplateManagementController {
 
-    private TemplateService templateService;
+    private final TemplateService templateService;
 
-    private TemplateReportService templateReportService;
+    private final TemplateReportService templateReportService;
 
     public TemplateManagementController(TemplateService templateService, TemplateReportService templateReportService) {
         this.templateService = templateService;
@@ -45,13 +45,13 @@ public class TemplateManagementController {
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object><TemplateDTO> updateTemplateByName(@RequestBody TemplateDTO templateDTO) {
+    public ResponseEntity<TemplateDTO> updateTemplateByName(@RequestBody TemplateDTO templateDTO) {
         TemplateDTO templateDTOOutput  = templateService.updateTemplateByName(templateDTO);
         return ResponseEntity.ok(templateDTOOutput);
     }
 
     @GetMapping(value = "/{template-name}")
-    public ResponseEntity<Object><List<TemplateDTO>> getTemplateByName(@NonNull @PathVariable("template-name") String templateName) {
+    public ResponseEntity<List<TemplateDTO>> getTemplateByName(@NonNull @PathVariable("template-name") String templateName) {
         List<TemplateDTO> templateDTO  = templateService.getTemplatesByName(templateName);
         return ResponseEntity.ok(templateDTO);
     }
@@ -73,13 +73,13 @@ public class TemplateManagementController {
     }
 
     @GetMapping(value = "/status/{report-uuid}")
-    public ResponseEntity<Object><TemplateReportDTO> getTemplateReportStatus(@PathVariable("report-uuid") String reportId) {
+    public ResponseEntity<TemplateReportDTO> getTemplateReportStatus(@PathVariable("report-uuid") String reportId) {
         TemplateReportDTO templateReportStatus = templateReportService.getTemplateReportStatus(reportId);
         return ResponseEntity.ok(templateReportStatus);
     }
 
     @GetMapping(value = "/download/{report-uuid}", produces = MediaType.TEXT_PLAIN_VALUE)
-    public ResponseEntity<Object><String> downloadReportByReportId(@NonNull @PathVariable("report-uuid") String reportId) {
+    public ResponseEntity<String> downloadReportByReportId(@NonNull @PathVariable("report-uuid") String reportId) {
         TemplateReportDTO templateReportDTO = templateReportService.downloadReportByReportId(reportId);
         return ResponseEntity.ok(templateReportDTO.getOutputReportText());
     }

@@ -31,13 +31,13 @@ public class TemplateManagementController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity createTemplate(@RequestBody TemplateDTO templateDTO) {
+    public ResponseEntity<Object> createTemplate(@RequestBody TemplateDTO templateDTO) {
         templateService.createTemplate(templateDTO);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping
-    public ResponseEntity getAllTemplates(@RequestParam int pageIndex, @RequestParam int pageSize) {
+    public ResponseEntity<Object> getAllTemplates(@RequestParam int pageIndex, @RequestParam int pageSize) {
         Sort defaultSorting = Sort.by(Sort.Order.desc("createdAt"));
         Page<TemplateDTO> templateDTOList =
                 templateService.getAllTemplates(PageRequest.of(pageIndex, pageSize, defaultSorting));
@@ -45,19 +45,19 @@ public class TemplateManagementController {
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<TemplateDTO> updateTemplateByName(@RequestBody TemplateDTO templateDTO) {
+    public ResponseEntity<Object><TemplateDTO> updateTemplateByName(@RequestBody TemplateDTO templateDTO) {
         TemplateDTO templateDTOOutput  = templateService.updateTemplateByName(templateDTO);
         return ResponseEntity.ok(templateDTOOutput);
     }
 
     @GetMapping(value = "/{template-name}")
-    public ResponseEntity<List<TemplateDTO>> getTemplateByName(@NonNull @PathVariable("template-name") String templateName) {
+    public ResponseEntity<Object><List<TemplateDTO>> getTemplateByName(@NonNull @PathVariable("template-name") String templateName) {
         List<TemplateDTO> templateDTO  = templateService.getTemplatesByName(templateName);
         return ResponseEntity.ok(templateDTO);
     }
 
     @PostMapping(value = "/{template-name}/process-data", consumes = MediaType.TEXT_PLAIN_VALUE)
-    public ResponseEntity processTemplate(@NonNull @PathVariable("template-name") String templateName,
+    public ResponseEntity<Object> processTemplate(@NonNull @PathVariable("template-name") String templateName,
                                                   @RequestParam String engine,
                                                   @Valid @RequestBody String dataTemplateJson) {
         TemplateReportDTO templateReportDTO = templateService.processTemplate(templateName, engine, dataTemplateJson);
@@ -65,7 +65,7 @@ public class TemplateManagementController {
     }
 
     @GetMapping(value = "/reports")
-    public ResponseEntity getTemplateReportDetails(@RequestParam int pageIndex, @RequestParam int pageSize) {
+    public ResponseEntity<Object> getTemplateReportDetails(@RequestParam int pageIndex, @RequestParam int pageSize) {
         Sort defaultSorting = Sort.by(Sort.Order.desc("startedAt"));
         Page<TemplateReportDTO> templateReportDetails =
                 templateReportService.getTemplateReportDetails(PageRequest.of(pageIndex, pageSize, defaultSorting));
@@ -73,13 +73,13 @@ public class TemplateManagementController {
     }
 
     @GetMapping(value = "/status/{report-uuid}")
-    public ResponseEntity<TemplateReportDTO> getTemplateReportStatus(@PathVariable("report-uuid") String reportId) {
+    public ResponseEntity<Object><TemplateReportDTO> getTemplateReportStatus(@PathVariable("report-uuid") String reportId) {
         TemplateReportDTO templateReportStatus = templateReportService.getTemplateReportStatus(reportId);
         return ResponseEntity.ok(templateReportStatus);
     }
 
     @GetMapping(value = "/download/{report-uuid}", produces = MediaType.TEXT_PLAIN_VALUE)
-    public ResponseEntity<String> downloadReportByReportId(@NonNull @PathVariable("report-uuid") String reportId) {
+    public ResponseEntity<Object><String> downloadReportByReportId(@NonNull @PathVariable("report-uuid") String reportId) {
         TemplateReportDTO templateReportDTO = templateReportService.downloadReportByReportId(reportId);
         return ResponseEntity.ok(templateReportDTO.getOutputReportText());
     }

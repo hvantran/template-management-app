@@ -14,7 +14,6 @@ import {
   PagingOptionMetadata,
   PagingResult,
   RestClient,
-  SnackbarAlertMetadata,
   SnackbarMessage,
   SpeedDialActionMetadata,
   TableMetadata,
@@ -24,7 +23,7 @@ import ProcessTracking from '../common/ProcessTracking';
 
 import { useNavigate } from 'react-router-dom';
 import { TEMPLATE_REPORT_BACKEND_URL, TemplateReportOverview } from '../AppConstants';
-import SnackbarAlert from '../common/SnackbarAlert';
+
 import TextTruncate from '../common/TextTruncate';
 import PageEntityRender from '../renders/PageEntityRender';
 
@@ -35,12 +34,10 @@ export default function TemplateTaskSummary() {
   const [processTracking, setCircleProcessOpen] = React.useState(false);
   let initialPagingResult: PagingResult = { totalElements: 0, content: [] };
   const [pagingResult, setPagingResult] = React.useState(initialPagingResult);
-  const [openError, setOpenError] = React.useState(false);
-  const [openSuccess, setOpenSuccess] = React.useState(false);
   const [pageIndex, setPageIndex] = React.useState(0);
   const [pageSize, setPageSize] = React.useState(10);
-  const [messageInfo, setMessageInfo] = React.useState<SnackbarMessage | undefined>(undefined);
-  const restClient = new RestClient(setCircleProcessOpen, setMessageInfo, setOpenError, setOpenSuccess);
+
+  const restClient = new RestClient(setCircleProcessOpen);
 
   const breadcrumbs = [
     <Link underline="hover" key="1" color="inherit" href='#'>
@@ -55,8 +52,8 @@ export default function TemplateTaskSummary() {
     { id: 'uuid', label: 'Task ID', minWidth: 100, isKeyColumn: true },
     { id: 'status', label: 'Status', minWidth: 100 },
     {
-      id: 'outputReportText', 
-      label: 'Text', 
+      id: 'outputReportText',
+      label: 'Text',
       minWidth: 100,
       format: (value: string) => (<TextTruncate text={value} maxTextLength={100} tooltipVisiable={false} />)
     },
@@ -178,24 +175,15 @@ export default function TemplateTaskSummary() {
         actionIcon: <RefreshIcon />,
         actionLabel: "Refresh templates",
         actionName: "refreshAction",
-        onClick: ()  => loadTemplateReportSummaryAsync(pageIndex, pageSize)
+        onClick: () => loadTemplateReportSummaryAsync(pageIndex, pageSize)
       }
     ]
-  }
-
-  let snackbarAlertMetadata: SnackbarAlertMetadata = {
-    openError,
-    openSuccess,
-    setOpenError,
-    setOpenSuccess,
-    messageInfo
   }
 
   return (
     <Stack spacing={2}>
       <PageEntityRender {...pageEntityMetadata}></PageEntityRender>
       <ProcessTracking isLoading={processTracking}></ProcessTracking>
-      <SnackbarAlert {...snackbarAlertMetadata}></SnackbarAlert>
     </Stack>
   );
 }

@@ -11,7 +11,6 @@ import {
   PropType,
   PropertyMetadata,
   RestClient,
-  SnackbarAlertMetadata,
   SnackbarMessage,
   onChangeProperty
 } from '../GenericConstants';
@@ -25,7 +24,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ROOT_BREADCRUMB, TEMPLATE_BACKEND_URL, TemplateMetadata, TemplateOverview } from '../AppConstants';
-import SnackbarAlert from '../common/SnackbarAlert';
+
 import PageEntityRender from '../renders/PageEntityRender';
 import { green, grey } from '@mui/material/colors';
 
@@ -41,7 +40,7 @@ export default function TemplateDetails() {
   }
 
 
-  const enableEditFunction = function(isEnabled: boolean) {
+  const enableEditFunction = function (isEnabled: boolean) {
 
     setEditActionMeta(previous => {
       previous.disable = isEnabled;
@@ -69,7 +68,7 @@ export default function TemplateDetails() {
       isRequired: true,
       disabled: true,
       layoutProperties: { xs: 12, alignItems: "center", justifyContent: "center" },
-      labelElementProperties: { xs: 2,  sx: { pl: 10 } },
+      labelElementProperties: { xs: 2, sx: { pl: 10 } },
       valueElementProperties: { xs: 10 },
       propDescription: 'The template name',
       propType: PropType.InputText,
@@ -89,7 +88,7 @@ export default function TemplateDetails() {
       disabled: true,
       propDefaultValue: '',
       layoutProperties: { xs: 12 },
-      labelElementProperties: { xs: 2,  sx: { pl: 10 } },
+      labelElementProperties: { xs: 2, sx: { pl: 10 } },
       valueElementProperties: { xs: 10 },
       isRequired: true,
       propType: PropType.CodeEditor,
@@ -112,7 +111,7 @@ export default function TemplateDetails() {
       propDefaultValue: '',
       disabled: true,
       layoutProperties: { xs: 12 },
-      labelElementProperties: { xs: 2,  sx: { pl: 10 } },
+      labelElementProperties: { xs: 2, sx: { pl: 10 } },
       valueElementProperties: { xs: 10 },
       isRequired: true,
       propType: PropType.CodeEditor,
@@ -128,17 +127,14 @@ export default function TemplateDetails() {
       }
     }]);
   const [processTracking, setCircleProcessOpen] = React.useState(false);
-  const [openError, setOpenError] = React.useState(false);
-  const [openSuccess, setOpenSuccess] = React.useState(false);
-  const [messageInfo, setMessageInfo] = React.useState<SnackbarMessage | undefined>(undefined);
-  const restClient = new RestClient(setCircleProcessOpen, setMessageInfo, setOpenError, setOpenSuccess);
+  const restClient = new RestClient(setCircleProcessOpen);
   const [saveActionMeta, setSaveActionMeta] = React.useState<GenericActionMetadata>(
     {
       actionIcon: <SaveIcon />,
       actionLabel: "Save",
       actionName: "saveAction",
       disable: true,
-      onClick: ()  => {
+      onClick: () => {
         putTemplateAsync();
       }
     });
@@ -147,7 +143,7 @@ export default function TemplateDetails() {
       actionIcon: <EditIcon />,
       actionLabel: "Edit",
       actionName: "editAction",
-      onClick: ()  => enableEditFunction(true)
+      onClick: () => enableEditFunction(true)
     });
   const breadcrumbs = [
     <Link underline="hover" key="1" color="inherit" href='/templates'>
@@ -199,7 +195,7 @@ export default function TemplateDetails() {
     }
 
     const targetURL = `${TEMPLATE_BACKEND_URL}`;
-    await restClient.sendRequest(requestOptions, targetURL, async(response) => {
+    await restClient.sendRequest(requestOptions, targetURL, async (response) => {
       let responseJSON = await response.json();
       enableEditFunction(false);
       return { 'message': `${responseJSON['uuid']} is updated`, key: new Date().getTime() } as SnackbarMessage;
@@ -221,7 +217,7 @@ export default function TemplateDetails() {
         actionIcon: <RefreshIcon />,
         actionLabel: "Refresh",
         actionName: "refreshAction",
-        onClick: ()  => loadTemplateAsync(templateName)
+        onClick: () => loadTemplateAsync(templateName)
       },
       editActionMeta,
       saveActionMeta,
@@ -230,9 +226,9 @@ export default function TemplateDetails() {
         properties: { sx: { color: green[800] } },
         actionLabel: "Add Template Task",
         actionName: "addTaskAction",
-        onClick: ()  => {
+        onClick: () => {
           let dataTemplateProperty = findPropertyMetadata("dataTemplateJSON");
-          navigate("/tasks/new", {state: {template: {templateName, dataTemplateJSON: dataTemplateProperty?.propValue, dsiableTemplateNameProp: true}}})
+          navigate("/tasks/new", { state: { template: { templateName, dataTemplateJSON: dataTemplateProperty?.propValue, dsiableTemplateNameProp: true } } })
         }
       },
       {
@@ -240,39 +236,34 @@ export default function TemplateDetails() {
         properties: { sx: { color: grey[800] } },
         actionLabel: "Clone Temmplate",
         actionName: "cloneTemplate",
-        onClick: ()  => {
+        onClick: () => {
           let dataTemplateProperty = findPropertyMetadata("dataTemplateJSON");
           let templateContentProperty = findPropertyMetadata("templateText");
 
-          navigate("/templates/new", {state: {template: {
-            templateName: templateName + "-Copy", 
-            dataTemplateJSON: dataTemplateProperty?.propValue, 
-            templateContent: templateContentProperty?.propValue
-          }}})
+          navigate("/templates/new", {
+            state: {
+              template: {
+                templateName: templateName + "-Copy",
+                dataTemplateJSON: dataTemplateProperty?.propValue,
+                templateContent: templateContentProperty?.propValue
+              }
+            }
+          })
         }
       },
-      
+
     ],
     properties: propertyMetadata
   }
 
-  function findPropertyMetadata(propName: string):PropertyMetadata | undefined {
+  function findPropertyMetadata(propName: string): PropertyMetadata | undefined {
     return propertyMetadata.find(p => p.propName === propName);
-  }
-
-  let snackbarAlertMetadata: SnackbarAlertMetadata = {
-    openError,
-    openSuccess,
-    setOpenError,
-    setOpenSuccess,
-    messageInfo
   }
 
   return (
     <Stack spacing={2}>
       <PageEntityRender {...pageEntityMetadata}></PageEntityRender>
       <ProcessTracking isLoading={processTracking}></ProcessTracking>
-      <SnackbarAlert {...snackbarAlertMetadata}></SnackbarAlert>
     </Stack>
   );
 }

@@ -12,29 +12,25 @@ import {
   PropType,
   PropertyMetadata,
   RestClient,
-  SnackbarAlertMetadata,
   SnackbarMessage,
   StepMetadata,
   onchangeStepDefault
 } from '../GenericConstants';
 import ProcessTracking from '../common/ProcessTracking';
-import SnackbarAlert from '../common/SnackbarAlert';
+
 import PageEntityRender from '../renders/PageEntityRender';
 
 
 export default function TemplateCreation() {
 
   const location = useLocation();
-  let templateName = location.state?.template.templateName || '' ;
-  let dataTemplateJSON = location.state?.template.dataTemplateJSON || '{}' ;
-  let templateText = location.state?.template.templateContent || '{}' ;
+  let templateName = location.state?.template.templateName || '';
+  let dataTemplateJSON = location.state?.template.dataTemplateJSON || '{}';
+  let templateText = location.state?.template.templateContent || '{}';
   let initialStepsV3: Array<StepMetadata> = []
-  const [openError, setOpenError] = React.useState(false);
-  const [openSuccess, setOpenSuccess] = React.useState(false);
-  const [messageInfo, setMessageInfo] = React.useState<SnackbarMessage | undefined>(undefined);
   const [processTracking, setCircleProcessOpen] = React.useState(false);
   const [stepMetadatas, setStepMetadatas] = React.useState(initialStepsV3);
-  const restClient = new RestClient(setCircleProcessOpen, setMessageInfo, setOpenError, setOpenSuccess);
+  const restClient = new RestClient(setCircleProcessOpen);
 
   let initialStepMetadatas: Array<StepMetadata> = [
     {
@@ -48,7 +44,7 @@ export default function TemplateCreation() {
           propValue: templateName,
           isRequired: true,
           layoutProperties: { xs: 12, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 2,  sx: { pl: 10 } },
+          labelElementProperties: { xs: 2, sx: { pl: 10 } },
           valueElementProperties: { xs: 10 },
           propDescription: 'The template name',
           propType: PropType.InputText,
@@ -71,7 +67,7 @@ export default function TemplateCreation() {
           propValue: dataTemplateJSON,
           propDefaultValue: '{}',
           layoutProperties: { xs: 12 },
-          labelElementProperties: { xs: 2,  sx: { pl: 10 } },
+          labelElementProperties: { xs: 2, sx: { pl: 10 } },
           valueElementProperties: { xs: 10 },
           isRequired: true,
           propType: PropType.CodeEditor,
@@ -93,7 +89,7 @@ export default function TemplateCreation() {
           propValue: templateText,
           propDefaultValue: '',
           layoutProperties: { xs: 12 },
-          labelElementProperties: { xs: 2,  sx: { pl: 10 } },
+          labelElementProperties: { xs: 2, sx: { pl: 10 } },
           valueElementProperties: { xs: 10 },
           isRequired: true,
           propType: PropType.CodeEditor,
@@ -148,11 +144,11 @@ export default function TemplateCreation() {
       if (!templateMetadataMetadata) {
         throw new Error("Missing templateMetadata definition");
       }
-      
+
       let templateName = findStepPropertyByCondition(templateMetadataMetadata, property => property.propName.startsWith("templateName"))?.propValue;
       let templateText = findStepPropertyByCondition(templateMetadataMetadata, property => property.propName.startsWith("templateText"))?.propValue;
       let dataTemplateJSON = findStepPropertyByCondition(templateMetadataMetadata, property => property.propName.startsWith("dataTemplateJSON"))?.propValue;
-      return {templateName, templateText, dataTemplateJSON}
+      return { templateName, templateText, dataTemplateJSON }
     }
 
     return getTemplateMetadata();
@@ -172,19 +168,10 @@ export default function TemplateCreation() {
   }
 
 
-  let snackbarAlertMetadata: SnackbarAlertMetadata = {
-    openError,
-    openSuccess,
-    setOpenError,
-    setOpenSuccess,
-    messageInfo
-  }
-
   return (
     <Stack spacing={4}>
       <PageEntityRender {...initialPageEntityMetdata} />
       <ProcessTracking isLoading={processTracking}></ProcessTracking>
-      <SnackbarAlert {...snackbarAlertMetadata}></SnackbarAlert>
     </Stack>
   );
 }

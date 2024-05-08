@@ -18,7 +18,6 @@ import {
   PagingOptionMetadata,
   PagingResult,
   RestClient,
-  SnackbarAlertMetadata,
   SnackbarMessage,
   SpeedDialActionMetadata,
   TableMetadata,
@@ -27,8 +26,8 @@ import {
 import ProcessTracking from '../common/ProcessTracking';
 
 import { useNavigate } from 'react-router-dom';
-import { TEMPLATE_BACKEND_URL, TemplateOverview, ROOT_BREADCRUMB} from '../AppConstants';
-import SnackbarAlert from '../common/SnackbarAlert';
+import { TEMPLATE_BACKEND_URL, TemplateOverview, ROOT_BREADCRUMB } from '../AppConstants';
+
 import TextTruncate from '../common/TextTruncate';
 import PageEntityRender from '../renders/PageEntityRender';
 
@@ -39,12 +38,10 @@ export default function TemplateSummary() {
   const [processTracking, setCircleProcessOpen] = React.useState(false);
   let initialPagingResult: PagingResult = { totalElements: 0, content: [] };
   const [pagingResult, setPagingResult] = React.useState(initialPagingResult);
-  const [openError, setOpenError] = React.useState(false);
-  const [openSuccess, setOpenSuccess] = React.useState(false);
   const [pageIndex, setPageIndex] = React.useState(0);
   const [pageSize, setPageSize] = React.useState(10);
-  const [messageInfo, setMessageInfo] = React.useState<SnackbarMessage | undefined>(undefined);
-  const restClient = new RestClient(setCircleProcessOpen, setMessageInfo, setOpenError, setOpenSuccess);
+
+  const restClient = new RestClient(setCircleProcessOpen);
 
   const breadcrumbs = [
     <Link underline="hover" key="1" color="inherit" href='#'>
@@ -59,8 +56,8 @@ export default function TemplateSummary() {
     { id: 'uuid', label: 'Template ID', isHidden: true, minWidth: 100, isKeyColumn: true },
     { id: 'templateName', label: 'Name', minWidth: 100 },
     {
-      id: 'templateText', 
-      label: 'Text', 
+      id: 'templateText',
+      label: 'Text',
       minWidth: 100,
       format: (value: string) => (<TextTruncate text={value} maxTextLength={100} tooltipVisiable={false} />)
     },
@@ -99,11 +96,15 @@ export default function TemplateSummary() {
           actionName: "addTaskAction",
           onClick: (row: TemplateOverview) => {
             return () => {
-            navigate("/tasks/new", {state: {template: {
-              templateName: row.templateName,
-               dataTemplateJSON: row.dataTemplateJSON,
-                dsiableTemplateNameProp: true
-              }}})
+              navigate("/tasks/new", {
+                state: {
+                  template: {
+                    templateName: row.templateName,
+                    dataTemplateJSON: row.dataTemplateJSON,
+                    dsiableTemplateNameProp: true
+                  }
+                }
+              })
             }
           }
         },
@@ -114,12 +115,17 @@ export default function TemplateSummary() {
           actionName: "cloneTemplate",
           onClick: (row: TemplateOverview) => {
             return () => {
-              navigate("/templates/new", {state: {template: {
-                templateName: row.templateName + "-Copy", 
-                dataTemplateJSON: row.dataTemplateJSON, 
-                templateContent: row.templateText
-              }}})
-          }}
+              navigate("/templates/new", {
+                state: {
+                  template: {
+                    templateName: row.templateName + "-Copy",
+                    dataTemplateJSON: row.dataTemplateJSON,
+                    templateContent: row.templateText
+                  }
+                }
+              })
+            }
+          }
         },
         {
           actionIcon: <DeleteIcon />,
@@ -216,24 +222,15 @@ export default function TemplateSummary() {
         actionIcon: <RefreshIcon />,
         actionLabel: "Refresh templates",
         actionName: "refreshAction",
-        onClick: ()  => loadTemplateSummaryAsync(pageIndex, pageSize)
+        onClick: () => loadTemplateSummaryAsync(pageIndex, pageSize)
       }
     ]
-  }
-
-  let snackbarAlertMetadata: SnackbarAlertMetadata = {
-    openError,
-    openSuccess,
-    setOpenError,
-    setOpenSuccess,
-    messageInfo
   }
 
   return (
     <Stack spacing={2}>
       <PageEntityRender {...pageEntityMetadata}></PageEntityRender>
       <ProcessTracking isLoading={processTracking}></ProcessTracking>
-      <SnackbarAlert {...snackbarAlertMetadata}></SnackbarAlert>
     </Stack>
   );
 }

@@ -11,13 +11,12 @@ import {
   PropType,
   PropertyMetadata,
   RestClient,
-  SnackbarAlertMetadata,
   SnackbarMessage,
   StepMetadata,
   onchangeStepDefault
 } from '../GenericConstants';
 import ProcessTracking from '../common/ProcessTracking';
-import SnackbarAlert from '../common/SnackbarAlert';
+
 import PageEntityRender from '../renders/PageEntityRender';
 
 
@@ -25,16 +24,13 @@ export default function TemplateTaskCreation() {
 
   const location = useLocation();
   const navigate = useNavigate();
-  let templateName = location.state?.template.templateName || '' ;
-  let dataTemplateJSON = location.state?.template.dataTemplateJSON || '{}' ;
-  let dsiableTemplateNameProp = location.state?.template.dsiableTemplateNameProp || false ;
+  let templateName = location.state?.template.templateName || '';
+  let dataTemplateJSON = location.state?.template.dataTemplateJSON || '{}';
+  let dsiableTemplateNameProp = location.state?.template.dsiableTemplateNameProp || false;
   let initialStepsV3: Array<StepMetadata> = []
-  const [openError, setOpenError] = React.useState(false);
-  const [openSuccess, setOpenSuccess] = React.useState(false);
-  const [messageInfo, setMessageInfo] = React.useState<SnackbarMessage | undefined>(undefined);
   const [processTracking, setCircleProcessOpen] = React.useState(false);
   const [stepMetadatas, setStepMetadatas] = React.useState(initialStepsV3);
-  const restClient = new RestClient(setCircleProcessOpen, setMessageInfo, setOpenError, setOpenSuccess);
+  const restClient = new RestClient(setCircleProcessOpen);
 
   let initialStepMetadatas: Array<StepMetadata> = [
     {
@@ -49,7 +45,7 @@ export default function TemplateTaskCreation() {
           isRequired: true,
           disabled: dsiableTemplateNameProp,
           layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4,  sx: { pl: 10 } },
+          labelElementProperties: { xs: 4, sx: { pl: 10 } },
           valueElementProperties: { xs: 8 },
           propDescription: 'The template name',
           propType: PropType.InputText,
@@ -72,11 +68,11 @@ export default function TemplateTaskCreation() {
           propValue: 'freemarker',
           propDefaultValue: 'freemarker',
           layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4,  sx: { pl: 10 } },
+          labelElementProperties: { xs: 4, sx: { pl: 10 } },
           valueElementProperties: { xs: 8 },
           propType: PropType.Selection,
           selectionMeta: {
-            selections: [{label: "freemarker", value: 'freemarker'}],
+            selections: [{ label: "freemarker", value: 'freemarker' }],
             onChangeEvent: function (event) {
               let propValue = event.target.value;
               let propName = event.target.name;
@@ -89,7 +85,7 @@ export default function TemplateTaskCreation() {
           propLabel: 'Template data',
           propValue: dataTemplateJSON,
           layoutProperties: { xs: 12 },
-          labelElementProperties: { xs: 2,  sx: { pl: 10 } },
+          labelElementProperties: { xs: 2, sx: { pl: 10 } },
           valueElementProperties: { xs: 10 },
           isRequired: true,
           propType: PropType.CodeEditor,
@@ -145,12 +141,12 @@ export default function TemplateTaskCreation() {
       if (!templateMetadataMetadata) {
         throw new Error("Missing templateMetadata definition");
       }
-      
+
       let templateName = findStepPropertyByCondition(templateMetadataMetadata, property => property.propName.startsWith("templateName"))?.propValue;
       let templateEngine = findStepPropertyByCondition(templateMetadataMetadata, property => property.propName.startsWith("templateEngine"))?.propValue;
       let templateData = findStepPropertyByCondition(templateMetadataMetadata, property => property.propName.startsWith("templateData"))?.propValue;
 
-      return {templateName, templateEngine, templateData}
+      return { templateName, templateEngine, templateData }
     }
 
     return getTemplateMetadata();
@@ -170,19 +166,10 @@ export default function TemplateTaskCreation() {
   }
 
 
-  let snackbarAlertMetadata: SnackbarAlertMetadata = {
-    openError,
-    openSuccess,
-    setOpenError,
-    setOpenSuccess,
-    messageInfo
-  }
-
   return (
     <Stack spacing={4}>
       <PageEntityRender {...initialPageEntityMetdata} />
       <ProcessTracking isLoading={processTracking}></ProcessTracking>
-      <SnackbarAlert {...snackbarAlertMetadata}></SnackbarAlert>
     </Stack>
   );
 }

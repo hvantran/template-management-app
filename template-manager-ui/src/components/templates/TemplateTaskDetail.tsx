@@ -11,7 +11,6 @@ import {
   PropType,
   PropertyMetadata,
   RestClient,
-  SnackbarAlertMetadata,
   SnackbarMessage,
   onChangeProperty
 } from '../GenericConstants';
@@ -21,10 +20,7 @@ import { javascript } from '@codemirror/lang-javascript';
 import { green } from '@mui/material/colors';
 import { useParams } from 'react-router-dom';
 import { TEMPLATE_BACKEND_URL } from '../AppConstants';
-import SnackbarAlert from '../common/SnackbarAlert';
 import PageEntityRender from '../renders/PageEntityRender';
-
-
 
 export default function TemplateTaskDetails() {
   const targetTemplate = useParams();
@@ -42,7 +38,7 @@ export default function TemplateTaskDetails() {
       propDefaultValue: '',
       disabled: true,
       layoutProperties: { xs: 12 },
-      labelElementProperties: { xs: 2,  sx: { pl: 10 } },
+      labelElementProperties: { xs: 2, sx: { pl: 10 } },
       valueElementProperties: { xs: 10 },
       isRequired: true,
       propType: PropType.CodeEditor,
@@ -59,10 +55,7 @@ export default function TemplateTaskDetails() {
       }
     }]);
   const [processTracking, setCircleProcessOpen] = React.useState(false);
-  const [openError, setOpenError] = React.useState(false);
-  const [openSuccess, setOpenSuccess] = React.useState(false);
-  const [messageInfo, setMessageInfo] = React.useState<SnackbarMessage | undefined>(undefined);
-  const restClient = new RestClient(setCircleProcessOpen, setMessageInfo, setOpenError, setOpenSuccess);
+  const restClient = new RestClient(setCircleProcessOpen);
 
   const breadcrumbs = [
     <Link underline="hover" key="1" color="inherit" href='/tasks'>
@@ -104,40 +97,29 @@ export default function TemplateTaskDetails() {
         properties: { sx: { color: green[800] } },
         actionLabel: "Copy to clipboard",
         actionName: "copyToClipboard",
-        onClick: ()  => {
+        onClick: () => {
           let outputReportText = findPropertyMetadata("outputReportText")
           navigator.clipboard.writeText(outputReportText?.propValue);
-          setMessageInfo({ 'message': 'Content is copied', key: new Date().getTime() } as SnackbarMessage);
-          setOpenSuccess(true)
         }
       },
       {
         actionIcon: <RefreshIcon />,
         actionLabel: "Refresh",
         actionName: "refreshAction",
-        onClick: ()  => loadTemplateAsync(taskId)
+        onClick: () => loadTemplateAsync(taskId)
       }
     ],
     properties: propertyMetadata
   }
 
-  function findPropertyMetadata(propName: string):PropertyMetadata | undefined {
+  function findPropertyMetadata(propName: string): PropertyMetadata | undefined {
     return propertyMetadata.find(p => p.propName === propName);
-  }
-
-  let snackbarAlertMetadata: SnackbarAlertMetadata = {
-    openError,
-    openSuccess,
-    setOpenError,
-    setOpenSuccess,
-    messageInfo
   }
 
   return (
     <Stack spacing={2}>
       <PageEntityRender {...pageEntityMetadata}></PageEntityRender>
       <ProcessTracking isLoading={processTracking}></ProcessTracking>
-      <SnackbarAlert {...snackbarAlertMetadata}></SnackbarAlert>
     </Stack>
   );
 }

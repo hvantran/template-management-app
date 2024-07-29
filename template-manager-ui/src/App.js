@@ -1,17 +1,16 @@
 import { Stack, ThemeProvider } from '@mui/material'
 import React from 'react'
-import { Route, Routes } from 'react-router-dom'
-import PrimarySearchAppBar from './ResponsiveAppBar'
-import HomeContent from './components/HomeContent'
-import TemplateSummary from './components/templates/TemplateSummary'
-import TemplateDetails from './components/templates/TemplateDetail'
-import TemplateCreation from './components/templates/TemplateCreation'
+import { Route, Routes, Navigate } from 'react-router-dom'
+import { ToastContainer } from 'react-toastify'
 import ErrorPage from './components/common/ErrorPage'
 import { DEFAULT_THEME } from './components/GenericConstants'
-import TemplateTaskSummary from './components/templates/TemplateTaskSummary'
+import TemplateCreation from './components/templates/TemplateCreation'
+import TemplateDetails from './components/templates/TemplateDetail'
+import TemplateSummary from './components/templates/TemplateSummary'
 import TemplateTaskCreation from './components/templates/TemplateTaskCreation'
 import TemplateTaskDetails from './components/templates/TemplateTaskDetail'
-import { ToastContainer } from 'react-toastify'
+import TemplateTaskSummary from './components/templates/TemplateTaskSummary'
+import PrimarySearchAppBar from './ResponsiveAppBar'
 
 function App () {
   return (
@@ -21,9 +20,10 @@ function App () {
         <Routes>
           <Route
             path='/'
-            element={<HomeContent />}
+            element={<Navigate to="/templates" />}
             errorElement={<ErrorPage />}
-          ></Route>
+          >
+          </Route>
           <Route path='/templates' element={<TemplateSummary />}></Route>
           <Route path='/templates/new' element={<TemplateCreation />}></Route>
           <Route

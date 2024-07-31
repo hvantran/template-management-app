@@ -72,11 +72,4 @@ public class TemplateService {
         Page<Template> templates = templateRepository.findAll(pageRequest);
         return templates.map(Template::toTemplateDTO);
     }
-
-    public Page<TemplateDTO> getAllTemplates1(PageRequest pageRequest) {
-        Iterable<Template> templates = templateRepository.findAll();
-        List<Template> templateList = StreamSupport.stream(templates.spliterator(), false).toList();
-        PageImpl<Template> templatePage = new PageImpl<>(templateList, pageRequest, templateList.size());
-        return templatePage.map(Template::toTemplateDTO);
-    }
 }

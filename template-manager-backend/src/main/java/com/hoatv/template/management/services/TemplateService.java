@@ -2,20 +2,20 @@ package com.hoatv.template.management.services;
 
 import com.hoatv.fwk.common.ultilities.ObjectUtils;
 import com.hoatv.monitor.mgmt.LoggingMonitor;
+import com.hoatv.template.management.collections.Template;
 import com.hoatv.template.management.dtos.TemplateDTO;
 import com.hoatv.template.management.dtos.TemplateReportDTO;
-import com.hoatv.template.management.entities.Template;
 import com.hoatv.template.management.repositories.TemplateRepository;
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.elasticsearch.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 @Service
-@Transactional
 public class TemplateService {
 
     private static final String TEMPLATE_NOT_FOUND_PREFIX_MSG = "Cannot find template with name: ";
@@ -31,9 +31,9 @@ public class TemplateService {
     public TemplateReportDTO processTemplate(String templateName, String engine, String dataTemplateJson) {
         List<Template> templates = templateRepository.findTemplateByTemplateName(templateName);
         ObjectUtils.checkThenThrow(templates.isEmpty(),
-                () -> new EntityNotFoundException(TEMPLATE_NOT_FOUND_PREFIX_MSG + templateName));
+                () -> new ResourceNotFoundException(TEMPLATE_NOT_FOUND_PREFIX_MSG + templateName));
         ObjectUtils.checkThenThrow(templates.size() > 1, "Cannot process template due to more than one template found");
-        Template templateDTO = templates.get(0);
+        Template templateDTO = templates.getFirst();
         return templateReportService.processTemplate(templateDTO, engine, dataTemplateJson);
     }
 
@@ -50,7 +50,7 @@ public class TemplateService {
     public List<TemplateDTO> getTemplatesByName(String templateName) {
         List<Template> templates = templateRepository.findTemplateByTemplateName(templateName);
         ObjectUtils.checkThenThrow(templates.isEmpty(),
-                () -> new EntityNotFoundException(TEMPLATE_NOT_FOUND_PREFIX_MSG + templateName));
+                () -> new ResourceNotFoundException(TEMPLATE_NOT_FOUND_PREFIX_MSG + templateName));
         return templates.stream().map(Template::toTemplateDTO).toList();
     }
 
@@ -58,10 +58,10 @@ public class TemplateService {
     public TemplateDTO updateTemplateByName(TemplateDTO templateDTO) {
         List<Template> templates = templateRepository.findTemplateByTemplateName(templateDTO.getTemplateName());
         ObjectUtils.checkThenThrow(templates.isEmpty(),
-                () -> new EntityNotFoundException(TEMPLATE_NOT_FOUND_PREFIX_MSG + templateDTO.getTemplateName()));
+                () -> new ResourceNotFoundException(TEMPLATE_NOT_FOUND_PREFIX_MSG + templateDTO.getTemplateName()));
         ObjectUtils.checkThenThrow(templates.size() > 1,
                 "Cannot process template due to more than one template found");
-        Template template = templates.get(0);
+        Template template = templates.getFirst();
         template.setTemplateText(templateDTO.getTemplateText());
         template.setDataTemplateJSON(templateDTO.getDataTemplateJSON());
         templateRepository.save(template);
@@ -71,5 +71,12 @@ public class TemplateService {
     public Page<TemplateDTO> getAllTemplates(PageRequest pageRequest) {
         Page<Template> templates = templateRepository.findAll(pageRequest);
         return templates.map(Template::toTemplateDTO);
+    }
+
+    public Page<TemplateDTO> getAllTemplates1(PageRequest pageRequest) {
+        Iterable<Template> templates = templateRepository.findAll();
+        List<Template> templateList = StreamSupport.stream(templates.spliterator(), false).toList();
+        PageImpl<Template> templatePage = new PageImpl<>(templateList, pageRequest, templateList.size());
+        return templatePage.map(Template::toTemplateDTO);
     }
 }

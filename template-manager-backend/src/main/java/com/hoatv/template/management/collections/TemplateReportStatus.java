@@ -1,4 +1,4 @@
-package com.hoatv.template.management.entities;
+package com.hoatv.template.management.collections;
 
 public enum TemplateReportStatus {
 

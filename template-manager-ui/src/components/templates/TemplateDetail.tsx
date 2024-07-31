@@ -233,7 +233,6 @@ export default function TemplateDetails() {
       },
       {
         actionIcon: <FileCopyIcon />,
-        properties: { sx: { color: grey[800] } },
         actionLabel: "Clone Temmplate",
         actionName: "cloneTemplate",
         onClick: () => {

@@ -82,36 +82,8 @@ export default function TemplateSummary() {
       align: 'right',
       actions: [
         {
-          actionIcon: <ReadMoreIcon />,
-          actionLabel: "Action details",
-          actionName: "gotoActionDetail",
-          onClick: (row: TemplateOverview) => {
-            return () => navigate(`/templates/${row.templateName}`)
-          }
-        },
-        {
-          actionIcon: <AddTaskIcon />,
-          properties: { sx: { color: green[800] } },
-          actionLabel: "Add Template Task",
-          actionName: "addTaskAction",
-          onClick: (row: TemplateOverview) => {
-            return () => {
-              navigate("/tasks/new", {
-                state: {
-                  template: {
-                    templateName: row.templateName,
-                    dataTemplateJSON: row.dataTemplateJSON,
-                    dsiableTemplateNameProp: true
-                  }
-                }
-              })
-            }
-          }
-        },
-        {
           actionIcon: <FileCopyIcon />,
-          properties: { sx: { color: grey[800] } },
-          actionLabel: "Clone Temmplate",
+          actionLabel: "Clone",
           actionName: "cloneTemplate",
           onClick: (row: TemplateOverview) => {
             return () => {
@@ -128,12 +100,39 @@ export default function TemplateSummary() {
           }
         },
         {
+          actionIcon: <AddTaskIcon />,
+          properties: { sx: { color: green[800] } },
+          actionLabel: "Add Task",
+          actionName: "addTaskAction",
+          onClick: (row: TemplateOverview) => {
+            return () => {
+              navigate("/tasks/new", {
+                state: {
+                  template: {
+                    templateName: row.templateName,
+                    dataTemplateJSON: row.dataTemplateJSON,
+                    dsiableTemplateNameProp: true
+                  }
+                }
+              })
+            }
+          }
+        },
+        {
           actionIcon: <DeleteIcon />,
           properties: { sx: { color: red[800] } },
-          actionLabel: "Delete template",
+          actionLabel: "Delete",
           actionName: "deleteAction",
           onClick: (row: TemplateOverview) => {
             return () => deleteTemplate(row.uuid)
+          }
+        },
+        {
+          actionIcon: <ReadMoreIcon />,
+          actionLabel: "Action details",
+          actionName: "gotoActionDetail",
+          onClick: (row: TemplateOverview) => {
+            return () => navigate(`/templates/${row.templateName}`)
           }
         }
       ]

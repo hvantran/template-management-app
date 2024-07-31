@@ -1,14 +1,14 @@
 package com.hoatv.template.management.repositories;
 
-import com.hoatv.template.management.entities.Template;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import com.hoatv.template.management.collections.Template;
+import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
 import java.util.List;
 import java.util.UUID;
 
-@Repository
-public interface TemplateRepository extends JpaRepository<Template, UUID> {
+
+public interface TemplateRepository extends ElasticsearchRepository<Template, UUID> {
 
     List<Template> findTemplateByTemplateName(String templateName);
+
 }

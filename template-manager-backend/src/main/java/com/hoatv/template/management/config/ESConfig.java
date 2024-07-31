@@ -1,6 +1,7 @@
 package com.hoatv.template.management.config;
 
 import lombok.SneakyThrows;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,10 +11,7 @@ import org.springframework.data.elasticsearch.client.elc.ElasticsearchConfigurat
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLEngine;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509ExtendedTrustManager;
+import javax.net.ssl.*;
 import java.net.Socket;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
@@ -34,7 +32,7 @@ public class ESConfig extends ElasticsearchConfiguration {
     public ClientConfiguration clientConfiguration() {
         final ClientConfiguration clientConfiguration = ClientConfiguration.builder()
                 .connectedTo(elasticSearchURL)
-                .usingSsl(getSSLContext())
+                .usingSsl(getSSLContext(), NoopHostnameVerifier.INSTANCE)
                 .withBasicAuth(elasticSearchUsername, elasticSearchPassword)
                 .build();
         return clientConfiguration;

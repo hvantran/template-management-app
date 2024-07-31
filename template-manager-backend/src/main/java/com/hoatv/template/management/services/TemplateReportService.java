@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -78,5 +79,13 @@ public class TemplateReportService {
     public Page<TemplateReportDTO> getTemplateReportDetails(PageRequest pageRequest) {
         Page<TemplateReport> templateReportDetails = templateReportRepository.findAll(pageRequest);
         return templateReportDetails.map(TemplateReport::toTemplateReportDTO);
+    }
+
+    public void deleteReportByTemplate(UUID templateId) {
+        List<TemplateReport> templateReports = templateReportRepository.findByTemplateUUID(templateId);
+        templateReportRepository.deleteAll(templateReports);
+        List<TemplateData> templateDataList = templateDataRepository.findByTemplateUUID(templateId);
+        templateDataRepository.deleteAll(templateDataList);
+
     }
 }

@@ -1,19 +1,21 @@
 
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import AddTaskIcon from '@mui/icons-material/AddTask';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import ReadMoreIcon from '@mui/icons-material/ReadMore';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import AddTaskIcon from '@mui/icons-material/AddTask';
 
 import { Stack } from '@mui/material';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
-import { green, red, grey } from '@mui/material/colors';
+import { green, red } from '@mui/material/colors';
 import React from 'react';
 import {
   ColumnMetadata,
   DataTypeDisplayer,
+  DialogMetadata,
+  LocalStorageService,
   PageEntityMetadata,
   PagingOptionMetadata,
   PagingResult,
@@ -26,23 +28,43 @@ import {
 import ProcessTracking from '../common/ProcessTracking';
 
 import { useNavigate } from 'react-router-dom';
-import { TEMPLATE_BACKEND_URL, TemplateOverview, ROOT_BREADCRUMB } from '../AppConstants';
+import { ROOT_BREADCRUMB, TEMPLATE_BACKEND_URL, TemplateOverview } from '../AppConstants';
 
+import ConfirmationDialog from '../common/ConfirmationDialog';
 import TextTruncate from '../common/TextTruncate';
 import PageEntityRender from '../renders/PageEntityRender';
 
 
+
+const pageIndexStorageKey = "template-manager-template-table-page-index"
+const pageSizeStorageKey = "template-manager-template-table-page-size"
 
 export default function TemplateSummary() {
   const navigate = useNavigate();
   const [processTracking, setCircleProcessOpen] = React.useState(false);
   let initialPagingResult: PagingResult = { totalElements: 0, content: [] };
   const [pagingResult, setPagingResult] = React.useState(initialPagingResult);
-  const [pageIndex, setPageIndex] = React.useState(0);
-  const [pageSize, setPageSize] = React.useState(10);
+  const [pageIndex, setPageIndex] = React.useState(LocalStorageService.getOrDefault(pageIndexStorageKey, 0))
+  const [pageSize, setPageSize] = React.useState(LocalStorageService.getOrDefault(pageSizeStorageKey, 10))
 
   const restClient = new RestClient(setCircleProcessOpen);
+  const [deleteConfirmationDialogOpen, setDeleteConfirmationDialogOpen] = React.useState(false);
+  const [confirmationDialogContent, setConfirmationDialogContent] = React.useState(<p></p>);
+  const [confirmationDialogTitle, setConfirmationDialogTitle] = React.useState("");
+  const [confirmationDialogPositiveAction, setConfirmationDialogPositiveAction] = React.useState(() => () => { });
 
+  let confirmationDeleteDialogMeta: DialogMetadata = {
+    open: deleteConfirmationDialogOpen,
+    title: confirmationDialogTitle,
+    content: confirmationDialogContent,
+    positiveText: "Yes",
+    negativeText: "No",
+    negativeAction() {
+      setDeleteConfirmationDialogOpen(false);
+    },
+    positiveAction: confirmationDialogPositiveAction
+  }
+  
   const breadcrumbs = [
     <Link underline="hover" key="1" color="inherit" href='#'>
       {ROOT_BREADCRUMB}
@@ -123,8 +145,14 @@ export default function TemplateSummary() {
           properties: { sx: { color: red[800] } },
           actionLabel: "Delete",
           actionName: "deleteAction",
-          onClick: (row: TemplateOverview) => {
-            return () => deleteTemplate(row.uuid)
+          onClick: (row: TemplateOverview) => () => {
+            setConfirmationDialogTitle("Delete")
+            setConfirmationDialogContent(previous => <p>Are you sure you want to delete <b>{row.templateName}</b> template?</p>)
+            setConfirmationDialogPositiveAction(previous => () => {
+              deleteTemplate(row.uuid)
+              setDeleteConfirmationDialogOpen(previous => !previous)
+            })
+            setDeleteConfirmationDialogOpen(previous => !previous)
           }
         },
         {
@@ -202,6 +230,8 @@ export default function TemplateSummary() {
     onPageChange: (pageIndex: number, pageSize: number) => {
       setPageIndex(pageIndex);
       setPageSize(pageSize);
+      LocalStorageService.put(pageIndexStorageKey, pageIndex)
+      LocalStorageService.put(pageSizeStorageKey, pageSize)
     }
   }
 
@@ -230,6 +260,7 @@ export default function TemplateSummary() {
     <Stack spacing={2}>
       <PageEntityRender {...pageEntityMetadata}></PageEntityRender>
       <ProcessTracking isLoading={processTracking}></ProcessTracking>
+      <ConfirmationDialog {...confirmationDeleteDialogMeta}></ConfirmationDialog>
     </Stack>
   );
 }

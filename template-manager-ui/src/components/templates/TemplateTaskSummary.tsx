@@ -10,6 +10,7 @@ import { green } from '@mui/material/colors';
 import React from 'react';
 import {
   ColumnMetadata,
+  LocalStorageService,
   PageEntityMetadata,
   PagingOptionMetadata,
   PagingResult,
@@ -28,14 +29,16 @@ import TextTruncate from '../common/TextTruncate';
 import PageEntityRender from '../renders/PageEntityRender';
 
 
+const pageIndexStorageKey = "template-manager-template-task-table-page-index"
+const pageSizeStorageKey = "template-manager-template-task-table-page-size"
 
 export default function TemplateTaskSummary() {
   const navigate = useNavigate();
   const [processTracking, setCircleProcessOpen] = React.useState(false);
   let initialPagingResult: PagingResult = { totalElements: 0, content: [] };
   const [pagingResult, setPagingResult] = React.useState(initialPagingResult);
-  const [pageIndex, setPageIndex] = React.useState(0);
-  const [pageSize, setPageSize] = React.useState(10);
+  const [pageIndex, setPageIndex] = React.useState(LocalStorageService.getOrDefault(pageIndexStorageKey, 0))
+  const [pageSize, setPageSize] = React.useState(LocalStorageService.getOrDefault(pageSizeStorageKey, 10))
 
   const restClient = new RestClient(setCircleProcessOpen);
 
@@ -102,7 +105,7 @@ export default function TemplateTaskSummary() {
       actions: [
         {
           actionIcon: <ReadMoreIcon />,
-          actionLabel: "Action details",
+          actionLabel: "Go to details",
           actionName: "gotoActionDetail",
           onClick: (row: TemplateReportOverview) => {
             return () => navigate(`/tasks/${row.uuid}`)
@@ -154,8 +157,10 @@ export default function TemplateTaskSummary() {
     component: 'div',
     rowsPerPageOptions: [5, 10, 20],
     onPageChange: (pageIndex: number, pageSize: number) => {
-      setPageIndex(pageIndex);
-      setPageSize(pageSize);
+      setPageIndex(pageIndex)
+      setPageSize(pageSize)
+      LocalStorageService.put(pageIndexStorageKey, pageIndex)
+      LocalStorageService.put(pageSizeStorageKey, pageSize)
     }
   }
 
@@ -173,7 +178,7 @@ export default function TemplateTaskSummary() {
     pageEntityActions: [
       {
         actionIcon: <RefreshIcon />,
-        actionLabel: "Refresh templates",
+        actionLabel: "Refresh",
         actionName: "refreshAction",
         onClick: () => loadTemplateReportSummaryAsync(pageIndex, pageSize)
       }

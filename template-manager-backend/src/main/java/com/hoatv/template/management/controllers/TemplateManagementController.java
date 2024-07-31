@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "/templates", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -27,7 +28,10 @@ public class TemplateManagementController {
 
     private final TemplateReportService templateReportService;
 
-    public TemplateManagementController(TemplateService templateService, TemplateReportService templateReportService) {
+    public TemplateManagementController(
+            TemplateService templateService,
+            TemplateReportService templateReportService) {
+        
         this.templateService = templateService;
         this.templateReportService = templateReportService;
     }
@@ -54,6 +58,12 @@ public class TemplateManagementController {
         return ResponseEntity.ok(templateDTOOutput);
     }
 
+    @DeleteMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> deleteTemplate(@NonNull @PathVariable("uuid") UUID templateId) {
+        templateService.deleteTemplate(templateId);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping(value = "/{template-name}")
     public ResponseEntity<List<TemplateDTO>> getTemplateByName(
             @NonNull @PathVariable("template-name") String templateName) {
@@ -67,7 +77,6 @@ public class TemplateManagementController {
             @NonNull @PathVariable("template-name") String templateName,
             @RequestParam("engine") String engine,
             @Valid @RequestBody String dataTemplateJson) {
-
         TemplateReportDTO templateReportDTO = templateService.processTemplate(templateName, engine, dataTemplateJson);
         return ResponseEntity.ok(Map.of("reportId", templateReportDTO.getUuid()));
     }

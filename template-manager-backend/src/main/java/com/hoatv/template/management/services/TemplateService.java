@@ -13,6 +13,7 @@ import org.springframework.data.elasticsearch.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -71,5 +72,12 @@ public class TemplateService {
     public Page<TemplateDTO> getAllTemplates(PageRequest pageRequest) {
         Page<Template> templates = templateRepository.findAll(pageRequest);
         return templates.map(Template::toTemplateDTO);
+    }
+
+    public void deleteTemplate(UUID templateId) {
+        Template template = templateRepository.findById(templateId)
+                .orElseThrow(() -> new ResourceNotFoundException(TEMPLATE_NOT_FOUND_PREFIX_MSG + templateId));
+        templateRepository.delete(template);
+        templateReportService.deleteReportByTemplate(templateId);
     }
 }

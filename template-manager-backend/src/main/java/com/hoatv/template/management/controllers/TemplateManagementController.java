@@ -72,6 +72,13 @@ public class TemplateManagementController {
         return ResponseEntity.ok(templateDTO);
     }
 
+    @GetMapping(value = "/search")
+    public ResponseEntity<List<TemplateDTO>> searchTemplate(
+            @NonNull @RequestParam("name") String templateName) {
+        List<TemplateDTO> templateDTO = templateService.searchTemplateByName(templateName);
+        return ResponseEntity.ok(templateDTO);
+    }
+
     @PostMapping(value = "/{template-name}/process-data", consumes = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<Object> processTemplate(
             @NonNull @PathVariable("template-name") String templateName,

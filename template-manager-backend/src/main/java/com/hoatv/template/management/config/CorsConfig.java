@@ -16,6 +16,7 @@ public class CorsConfig {
                         .allowedMethods("*")
                         .allowedOrigins(
                                 "http://localhost:3000",
+                                "http://localhost:3001",
                                 "http://templatemanui.local:6088",
                                 "http://actmanagerui.local:6084"
                         )

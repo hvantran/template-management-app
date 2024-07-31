@@ -1,5 +1,6 @@
 package com.hoatv.template.management.collections;
 
+import com.hoatv.template.management.callbacks.UUIDPersistable;
 import com.hoatv.template.management.dtos.TemplateDTO;
 import lombok.*;
 import lombok.experimental.FieldNameConstants;
@@ -21,7 +22,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @FieldNameConstants
 @Document(indexName = "template-#{T(java.time.LocalDate).now().toString()}")
-public class Template implements Persistable<UUID> {
+public class Template implements Persistable<UUID>, UUIDPersistable<UUID> {
 
     @Id
     private UUID id;

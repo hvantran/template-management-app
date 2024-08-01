@@ -44,8 +44,8 @@ export default function TemplateSummary() {
   const [processTracking, setCircleProcessOpen] = React.useState(false);
   let initialPagingResult: PagingResult = { totalElements: 0, content: [] };
   const [pagingResult, setPagingResult] = React.useState(initialPagingResult);
-  const [pageIndex, setPageIndex] = React.useState(LocalStorageService.getOrDefault(pageIndexStorageKey, 0))
-  const [pageSize, setPageSize] = React.useState(LocalStorageService.getOrDefault(pageSizeStorageKey, 10))
+  const [pageIndex, setPageIndex] = React.useState(parseInt(LocalStorageService.getOrDefault(pageIndexStorageKey, 0)))
+  const [pageSize, setPageSize] = React.useState(parseInt(LocalStorageService.getOrDefault(pageSizeStorageKey, 10)))
 
   const restClient = new RestClient(setCircleProcessOpen);
   const [deleteConfirmationDialogOpen, setDeleteConfirmationDialogOpen] = React.useState(false);
@@ -238,6 +238,7 @@ export default function TemplateSummary() {
   let tableMetadata: TableMetadata = {
     columns,
     pagingOptions: pagingOptions,
+    onRowClickCallback: (row: TemplateOverview) => navigate(`/templates/${row.templateName}`),
     pagingResult: pagingResult
   }
 

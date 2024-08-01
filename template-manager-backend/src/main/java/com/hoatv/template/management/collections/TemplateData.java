@@ -21,7 +21,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldNameConstants
-@Document(indexName = "template-data-#{T(java.time.LocalDate).now().toString()}")
+@Document(indexName = "template-data-collection")
 public class TemplateData implements Persistable<UUID>, UUIDPersistable<UUID> {
 
     @Id

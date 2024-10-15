@@ -38,6 +38,7 @@ import PageEntityRender from '../renders/PageEntityRender';
 
 const pageIndexStorageKey = "template-manager-template-table-page-index"
 const pageSizeStorageKey = "template-manager-template-table-page-size"
+const orderByStorageKey = "template-manager-template-table-order"
 
 export default function TemplateSummary() {
   const navigate = useNavigate();
@@ -46,6 +47,7 @@ export default function TemplateSummary() {
   const [pagingResult, setPagingResult] = React.useState(initialPagingResult);
   const [pageIndex, setPageIndex] = React.useState(parseInt(LocalStorageService.getOrDefault(pageIndexStorageKey, 0)))
   const [pageSize, setPageSize] = React.useState(parseInt(LocalStorageService.getOrDefault(pageSizeStorageKey, 10)))
+  const [orderBy, setOrderBy] = React.useState(LocalStorageService.getOrDefault(orderByStorageKey, '-updatedAt'));
 
   const restClient = new RestClient(setCircleProcessOpen);
   const [deleteConfirmationDialogOpen, setDeleteConfirmationDialogOpen] = React.useState(false);
@@ -75,8 +77,18 @@ export default function TemplateSummary() {
   ];
 
   const columns: ColumnMetadata[] = [
-    { id: 'uuid', label: 'Template ID', isHidden: true, minWidth: 100, isKeyColumn: true },
-    { id: 'templateName', label: 'Name', minWidth: 100 },
+    { 
+      id: 'uuid', 
+      label: 'Template ID', 
+      isHidden: true, 
+      minWidth: 100, 
+      isKeyColumn: true },
+    { 
+      id: 'templateName', 
+      label: 'Name', 
+      isSortable: true,
+      minWidth: 100 
+    },
     {
       id: 'templateText',
       label: 'Text',
@@ -86,6 +98,7 @@ export default function TemplateSummary() {
     {
       id: 'createdAt',
       label: 'Created at',
+      isSortable: true,
       minWidth: 170,
       align: 'left',
       format: DataTypeDisplayer.formatDate
@@ -93,6 +106,7 @@ export default function TemplateSummary() {
     {
       id: 'updatedAt',
       label: 'Updated at',
+      isSortable: true,
       minWidth: 170,
       align: 'left',
       format: DataTypeDisplayer.formatDate
@@ -178,7 +192,7 @@ export default function TemplateSummary() {
     }
     const targetURL = `${TEMPLATE_BACKEND_URL}/${templateId}`;
     await restClient.sendRequest(requestOptions, targetURL, () => {
-      loadTemplateSummaryAsync(pagingOptions.pageIndex, pagingOptions.pageSize);
+      loadTemplateSummaryAsync(pagingOptions.pageIndex, pagingOptions.pageSize, orderBy);
       return undefined;
     }, async (response: Response) => {
       let responseJSON = await response.json();
@@ -186,7 +200,7 @@ export default function TemplateSummary() {
     });
   }
 
-  const loadTemplateSummaryAsync = async (pageIndex: number, pageSize: number) => {
+  const loadTemplateSummaryAsync = async (pageIndex: number, pageSize: number, orderBy: string) => {
     const requestOptions = {
       method: "GET",
       headers: {
@@ -194,7 +208,7 @@ export default function TemplateSummary() {
       }
     }
 
-    const targetURL = `${TEMPLATE_BACKEND_URL}?pageIndex=${pageIndex}&pageSize=${pageSize}`;
+    const targetURL = `${TEMPLATE_BACKEND_URL}?pageIndex=${pageIndex}&pageSize=${pageSize}&orderBy=${orderBy}`;
     await restClient.sendRequest(requestOptions, targetURL, async (response) => {
       let templatePagingResult = await response.json() as PagingResult;
       setPagingResult(templatePagingResult);
@@ -206,8 +220,8 @@ export default function TemplateSummary() {
   }
 
   React.useEffect(() => {
-    loadTemplateSummaryAsync(pageIndex, pageSize);
-  }, [pageIndex, pageSize])
+    loadTemplateSummaryAsync(pageIndex, pageSize, orderBy);
+  }, [pageIndex, pageSize, orderBy])
 
   const templates: Array<SpeedDialActionMetadata> = [
     {
@@ -225,18 +239,23 @@ export default function TemplateSummary() {
   let pagingOptions: PagingOptionMetadata = {
     pageIndex,
     pageSize,
+    orderBy,
     component: 'div',
     rowsPerPageOptions: [5, 10, 20],
-    onPageChange: (pageIndex: number, pageSize: number) => {
+    onPageChange: (pageIndex: number, pageSize: number, orderBy: string) => {
       setPageIndex(pageIndex);
       setPageSize(pageSize);
+      setOrderBy(orderBy);
       LocalStorageService.put(pageIndexStorageKey, pageIndex)
       LocalStorageService.put(pageSizeStorageKey, pageSize)
+      LocalStorageService.put(orderByStorageKey, orderBy)
+      loadTemplateSummaryAsync(pageIndex, pageSize, orderBy);
     }
   }
 
   let tableMetadata: TableMetadata = {
     columns,
+    name: 'Overview',
     pagingOptions: pagingOptions,
     onRowClickCallback: (row: TemplateOverview) => navigate(`/templates/${row.templateName}`),
     pagingResult: pagingResult
@@ -252,7 +271,7 @@ export default function TemplateSummary() {
         actionIcon: <RefreshIcon />,
         actionLabel: "Refresh templates",
         actionName: "refreshAction",
-        onClick: () => loadTemplateSummaryAsync(pageIndex, pageSize)
+        onClick: () => loadTemplateSummaryAsync(pageIndex, pageSize, orderBy)
       }
     ]
   }

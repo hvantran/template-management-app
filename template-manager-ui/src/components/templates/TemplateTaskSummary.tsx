@@ -31,6 +31,7 @@ import PageEntityRender from '../renders/PageEntityRender';
 
 const pageIndexStorageKey = "template-manager-template-task-table-page-index"
 const pageSizeStorageKey = "template-manager-template-task-table-page-size"
+const orderByStorageKey = "template-manager-template-task-table-order"
 
 export default function TemplateTaskSummary() {
   const navigate = useNavigate();
@@ -39,6 +40,7 @@ export default function TemplateTaskSummary() {
   const [pagingResult, setPagingResult] = React.useState(initialPagingResult);
   const [pageIndex, setPageIndex] = React.useState(parseInt(LocalStorageService.getOrDefault(pageIndexStorageKey, 0)))
   const [pageSize, setPageSize] = React.useState(parseInt(LocalStorageService.getOrDefault(pageSizeStorageKey, 10)))
+  const [orderBy, setOrderBy] = React.useState(LocalStorageService.getOrDefault(orderByStorageKey, '-startedAt'))
 
   const restClient = new RestClient(setCircleProcessOpen);
 
@@ -52,8 +54,19 @@ export default function TemplateTaskSummary() {
   ];
 
   const columns: ColumnMetadata[] = [
-    { id: 'uuid', label: 'Task ID', minWidth: 100, isKeyColumn: true },
-    { id: 'status', label: 'Status', minWidth: 100 },
+    {
+      id: 'uuid',
+      label: 'Task ID',
+      isSortable: true,
+      minWidth: 100,
+      isKeyColumn: true
+    },
+    {
+      id: 'status',
+      label: 'Status',
+      isSortable: true,
+      minWidth: 100
+    },
     {
       id: 'outputReportText',
       label: 'Text',
@@ -63,6 +76,7 @@ export default function TemplateTaskSummary() {
     {
       id: 'startedAt',
       label: 'Start time',
+      isSortable: true,
       minWidth: 170,
       align: 'left',
       format: (value: number) => {
@@ -79,6 +93,7 @@ export default function TemplateTaskSummary() {
       id: 'endedAt',
       label: 'End time',
       minWidth: 170,
+      isSortable: true,
       align: 'left',
       format: (value: number) => {
 
@@ -94,6 +109,7 @@ export default function TemplateTaskSummary() {
       id: 'elapsedTime',
       label: 'Elapsed time',
       minWidth: 170,
+      isSortable: true,
       align: 'left',
       format: (value: string) => value
     },
@@ -115,7 +131,7 @@ export default function TemplateTaskSummary() {
     }
   ];
 
-  const loadTemplateReportSummaryAsync = async (pageIndex: number, pageSize: number) => {
+  const loadTemplateReportSummaryAsync = async (pageIndex: number, pageSize: number, orderBy: string) => {
     const requestOptions = {
       method: "GET",
       headers: {
@@ -123,7 +139,7 @@ export default function TemplateTaskSummary() {
       }
     }
 
-    const targetURL = `${TEMPLATE_REPORT_BACKEND_URL}?pageIndex=${pageIndex}&pageSize=${pageSize}`;
+    const targetURL = `${TEMPLATE_REPORT_BACKEND_URL}?pageIndex=${pageIndex}&pageSize=${pageSize}&orderBy=${orderBy}`;
     await restClient.sendRequest(requestOptions, targetURL, async (response) => {
       let templatePagingResult = await response.json() as PagingResult;
       setPagingResult(templatePagingResult);
@@ -135,8 +151,8 @@ export default function TemplateTaskSummary() {
   }
 
   React.useEffect(() => {
-    loadTemplateReportSummaryAsync(pageIndex, pageSize);
-  }, [pageIndex, pageSize])
+    loadTemplateReportSummaryAsync(pageIndex, pageSize, orderBy);
+  }, [pageIndex, pageSize, orderBy])
 
   const templates: Array<SpeedDialActionMetadata> = [
     {
@@ -154,18 +170,22 @@ export default function TemplateTaskSummary() {
   let pagingOptions: PagingOptionMetadata = {
     pageIndex,
     pageSize,
+    orderBy,
     component: 'div',
     rowsPerPageOptions: [5, 10, 20],
-    onPageChange: (pageIndex: number, pageSize: number) => {
-      setPageIndex(pageIndex)
-      setPageSize(pageSize)
+    onPageChange: (pageIndex: number, pageSize: number, orderBy: string) => {
+      setPageIndex(pageIndex);
+      setPageSize(pageSize);
+      setOrderBy(orderBy);
       LocalStorageService.put(pageIndexStorageKey, pageIndex)
       LocalStorageService.put(pageSizeStorageKey, pageSize)
+      LocalStorageService.put(orderByStorageKey, orderBy)
     }
   }
 
   let tableMetadata: TableMetadata = {
     columns,
+    name: 'Overview',
     onRowClickCallback: (row: TemplateReportOverview) => navigate(`/tasks/${row.uuid}`),
     pagingOptions: pagingOptions,
     pagingResult: pagingResult
@@ -181,7 +201,7 @@ export default function TemplateTaskSummary() {
         actionIcon: <RefreshIcon />,
         actionLabel: "Refresh",
         actionName: "refreshAction",
-        onClick: () => loadTemplateReportSummaryAsync(pageIndex, pageSize)
+        onClick: () => loadTemplateReportSummaryAsync(pageIndex, pageSize, orderBy)
       }
     ]
   }

@@ -144,9 +144,6 @@ export default function TemplateTaskSummary() {
       let templatePagingResult = await response.json() as PagingResult;
       setPagingResult(templatePagingResult);
       return { 'message': 'Load templates successfully!!', key: new Date().getTime() } as SnackbarMessage;
-    }, async (response: Response) => {
-      let responseJSON = await response.json();
-      return { 'message': responseJSON['message'], key: new Date().getTime() } as SnackbarMessage;
     });
   }
 

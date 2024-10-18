@@ -124,8 +124,6 @@ export default function TemplateCreation() {
         await restClient.sendRequest(requestOptions, targetURL, async () => {
           let message = `Template ${templateMetadata.templateName} is created`;
           return { 'message': message, key: new Date().getTime() } as SnackbarMessage;
-        }, async (response: Response) => {
-          return { 'message': "An interal error occurred during your request!", key: new Date().getTime() } as SnackbarMessage;
         });
       }
     }

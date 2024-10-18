@@ -79,9 +79,6 @@ export default function TemplateTaskDetails() {
       let templateOutput = await response.text() as string;
       setPropertyMetadata(onChangeProperty("outputReportText", templateOutput));
       return { 'message': 'Load template report successfully!!', key: new Date().getTime() } as SnackbarMessage;
-    }, async (response: Response) => {
-      let responseJSON = await response.json();
-      return { 'message': responseJSON['message'], key: new Date().getTime() } as SnackbarMessage;
     });
   }
   React.useEffect(() => {

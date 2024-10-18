@@ -121,8 +121,6 @@ export default function TemplateTaskCreation() {
           let responseJSON = await response.json();
           navigate(`/tasks/${responseJSON["reportId"]}`)
           return undefined;
-        }, async (response: Response) => {
-          return { 'message': "An interal error occurred during your request!", key: new Date().getTime() } as SnackbarMessage;
         });
       }
     }

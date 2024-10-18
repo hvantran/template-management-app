@@ -20,13 +20,13 @@ import { javascript } from '@codemirror/lang-javascript';
 import { json } from '@codemirror/lang-json';
 import AddTaskIcon from '@mui/icons-material/AddTask';
 import EditIcon from '@mui/icons-material/Edit';
-import SaveIcon from '@mui/icons-material/Save';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
+import SaveIcon from '@mui/icons-material/Save';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ROOT_BREADCRUMB, TEMPLATE_BACKEND_URL, TemplateMetadata, TemplateOverview } from '../AppConstants';
 
+import { green } from '@mui/material/colors';
 import PageEntityRender from '../renders/PageEntityRender';
-import { green, grey } from '@mui/material/colors';
 
 
 
@@ -169,9 +169,6 @@ export default function TemplateDetails() {
         setPropertyMetadata(onChangeProperty(propertyName, templateOverviews[0][propertyName as keyof TemplateOverview]));
       })
       return { 'message': 'Load template successfully!!', key: new Date().getTime() } as SnackbarMessage;
-    }, async (response: Response) => {
-      let responseJSON = await response.json();
-      return { 'message': responseJSON['message'], key: new Date().getTime() } as SnackbarMessage;
     });
   }
 
@@ -199,9 +196,6 @@ export default function TemplateDetails() {
       let responseJSON = await response.json();
       enableEditFunction(false);
       return { 'message': `${responseJSON['uuid']} is updated`, key: new Date().getTime() } as SnackbarMessage;
-    }, async (response: Response) => {
-      let responseJSON = await response.json();
-      return { 'message': responseJSON['message'], key: new Date().getTime() } as SnackbarMessage;
     });
   }
 

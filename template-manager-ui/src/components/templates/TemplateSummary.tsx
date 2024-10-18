@@ -194,9 +194,6 @@ export default function TemplateSummary() {
     await restClient.sendRequest(requestOptions, targetURL, () => {
       loadTemplateSummaryAsync(pagingOptions.pageIndex, pagingOptions.pageSize, orderBy);
       return undefined;
-    }, async (response: Response) => {
-      let responseJSON = await response.json();
-      return { 'message': responseJSON['message'], key: new Date().getTime() } as SnackbarMessage;
     });
   }
 
@@ -213,9 +210,6 @@ export default function TemplateSummary() {
       let templatePagingResult = await response.json() as PagingResult;
       setPagingResult(templatePagingResult);
       return { 'message': 'Load templates successfully!!', key: new Date().getTime() } as SnackbarMessage;
-    }, async (response: Response) => {
-      let responseJSON = await response.json();
-      return { 'message': responseJSON['message'], key: new Date().getTime() } as SnackbarMessage;
     });
   }
 

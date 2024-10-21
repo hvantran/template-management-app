@@ -201,7 +201,7 @@ export default function TemplateDetails() {
 
   React.useEffect(() => {
     loadTemplateAsync(templateName);
-  }, [])
+  }, [templateName])
 
   let pageEntityMetadata: PageEntityMetadata = {
     pageName: 'template-details',

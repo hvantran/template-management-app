@@ -11,7 +11,6 @@ import {
   PropType,
   PropertyMetadata,
   RestClient,
-  SnackbarMessage,
   StepMetadata,
   onchangeStepDefault
 } from '../GenericConstants';

@@ -83,7 +83,7 @@ export default function TemplateTaskDetails() {
   }
   React.useEffect(() => {
     loadTemplateAsync(taskId);
-  }, [])
+  }, [taskId])
 
   let pageEntityMetadata: PageEntityMetadata = {
     pageName: 'template-details',

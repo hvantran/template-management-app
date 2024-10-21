@@ -55,7 +55,7 @@ export default function TemplateTaskDetails() {
       }
     }]);
   const [processTracking, setCircleProcessOpen] = React.useState(false);
-  const restClient = new RestClient(setCircleProcessOpen);
+  const restClient = React.useMemo(() =>  new RestClient(setCircleProcessOpen), [setCircleProcessOpen]);
 
   const breadcrumbs = [
     <Link underline="hover" key="1" color="inherit" href='/tasks'>

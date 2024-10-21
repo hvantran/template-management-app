@@ -49,7 +49,7 @@ export default function TemplateSummary() {
   const [pageSize, setPageSize] = React.useState(parseInt(LocalStorageService.getOrDefault(pageSizeStorageKey, 10)))
   const [orderBy, setOrderBy] = React.useState(LocalStorageService.getOrDefault(orderByStorageKey, '-updatedAt'));
 
-  const restClient = new RestClient(setCircleProcessOpen);
+  const restClient = React.useMemo(() =>  new RestClient(setCircleProcessOpen), [setCircleProcessOpen]);
   const [deleteConfirmationDialogOpen, setDeleteConfirmationDialogOpen] = React.useState(false);
   const [confirmationDialogContent, setConfirmationDialogContent] = React.useState(<p></p>);
   const [confirmationDialogTitle, setConfirmationDialogTitle] = React.useState("");
@@ -215,7 +215,7 @@ export default function TemplateSummary() {
 
   React.useEffect(() => {
     loadTemplateSummaryAsync(pageIndex, pageSize, orderBy);
-  }, [pageIndex, pageSize, orderBy])
+  }, [pageIndex, pageSize, orderBy, restClient])
 
   const templates: Array<SpeedDialActionMetadata> = [
     {

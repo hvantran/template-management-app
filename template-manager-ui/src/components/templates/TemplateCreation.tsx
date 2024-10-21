@@ -30,7 +30,7 @@ export default function TemplateCreation() {
   let initialStepsV3: Array<StepMetadata> = []
   const [processTracking, setCircleProcessOpen] = React.useState(false);
   const [stepMetadatas, setStepMetadatas] = React.useState(initialStepsV3);
-  const restClient = new RestClient(setCircleProcessOpen);
+  const restClient = React.useMemo(() =>  new RestClient(setCircleProcessOpen), [setCircleProcessOpen]);
 
   let initialStepMetadatas: Array<StepMetadata> = [
     {

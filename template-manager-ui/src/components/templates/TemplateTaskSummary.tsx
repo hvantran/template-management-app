@@ -42,7 +42,7 @@ export default function TemplateTaskSummary() {
   const [pageSize, setPageSize] = React.useState(parseInt(LocalStorageService.getOrDefault(pageSizeStorageKey, 10)))
   const [orderBy, setOrderBy] = React.useState(LocalStorageService.getOrDefault(orderByStorageKey, '-startedAt'))
 
-  const restClient = new RestClient(setCircleProcessOpen);
+  const restClient = React.useMemo(() =>  new RestClient(setCircleProcessOpen), [setCircleProcessOpen]);
 
   const breadcrumbs = [
     <Link underline="hover" key="1" color="inherit" href='#'>
@@ -149,7 +149,7 @@ export default function TemplateTaskSummary() {
 
   React.useEffect(() => {
     loadTemplateReportSummaryAsync(pageIndex, pageSize, orderBy);
-  }, [pageIndex, pageSize, orderBy])
+  }, [pageIndex, pageSize, orderBy, restClient])
 
   const templates: Array<SpeedDialActionMetadata> = [
     {

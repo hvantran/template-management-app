@@ -127,7 +127,7 @@ export default function TemplateDetails() {
       }
     }]);
   const [processTracking, setCircleProcessOpen] = React.useState(false);
-  const restClient = new RestClient(setCircleProcessOpen);
+  const restClient = React.useMemo(() =>  new RestClient(setCircleProcessOpen), [setCircleProcessOpen]);
   const [saveActionMeta, setSaveActionMeta] = React.useState<GenericActionMetadata>(
     {
       actionIcon: <SaveIcon />,

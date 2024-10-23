@@ -251,6 +251,7 @@ export default function TemplateSummary() {
     columns,
     name: 'Overview',
     pagingOptions: pagingOptions,
+    tableContainerCssProps: {maxHeight: '100%'},
     onRowClickCallback: (row: TemplateOverview) => navigate(`/templates/${row.templateName}`),
     pagingResult: pagingResult
   }

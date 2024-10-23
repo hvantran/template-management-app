@@ -182,6 +182,7 @@ export default function TemplateTaskSummary() {
 
   let tableMetadata: TableMetadata = {
     columns,
+    tableContainerCssProps: {maxHeight: '100%'},
     name: 'Overview',
     onRowClickCallback: (row: TemplateReportOverview) => navigate(`/tasks/${row.uuid}`),
     pagingOptions: pagingOptions,

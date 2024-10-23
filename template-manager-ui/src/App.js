@@ -1,4 +1,4 @@
-import { Stack, ThemeProvider } from '@mui/material'
+import { Stack, ThemeProvider, CssBaseline } from '@mui/material'
 import React from 'react'
 import { Route, Routes, Navigate } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
@@ -14,7 +14,7 @@ import PrimarySearchAppBar from './ResponsiveAppBar'
 
 const selectThemeStorageKey = "template-manager-enable-dark-theme"
 
-function App () {
+function App() {
   const [toggleDarkMode, setToggleDarkMode] = React.useState(LocalStorageService.getOrDefault(selectThemeStorageKey, false) === 'true');
   const switchTheme = () => {
     setToggleDarkMode((previous) => {
@@ -24,8 +24,9 @@ function App () {
   }
   return (
     <ThemeProvider theme={!toggleDarkMode ? DEFAULT_THEME : DARK_THEME}>
+      <CssBaseline />
       <Stack>
-        <PrimarySearchAppBar toggleDarkMode={toggleDarkMode} setToggleDarkMode={switchTheme}/>
+        <PrimarySearchAppBar toggleDarkMode={toggleDarkMode} setToggleDarkMode={switchTheme} />
         <Routes>
           <Route
             path='/'

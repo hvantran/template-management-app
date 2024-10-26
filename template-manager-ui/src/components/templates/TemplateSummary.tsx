@@ -45,11 +45,13 @@ export default function TemplateSummary() {
   const [processTracking, setCircleProcessOpen] = React.useState(false);
   let initialPagingResult: PagingResult = { totalElements: 0, content: [] };
   const [pagingResult, setPagingResult] = React.useState(initialPagingResult);
+
+  const [searchText, setSearchText] = React.useState("")
   const [pageIndex, setPageIndex] = React.useState(parseInt(LocalStorageService.getOrDefault(pageIndexStorageKey, 0)))
   const [pageSize, setPageSize] = React.useState(parseInt(LocalStorageService.getOrDefault(pageSizeStorageKey, 10)))
   const [orderBy, setOrderBy] = React.useState(LocalStorageService.getOrDefault(orderByStorageKey, '-updatedAt'));
 
-  const restClient = React.useMemo(() =>  new RestClient(setCircleProcessOpen), [setCircleProcessOpen]);
+  const restClient = React.useMemo(() => new RestClient(setCircleProcessOpen), [setCircleProcessOpen]);
   const [deleteConfirmationDialogOpen, setDeleteConfirmationDialogOpen] = React.useState(false);
   const [confirmationDialogContent, setConfirmationDialogContent] = React.useState(<p></p>);
   const [confirmationDialogTitle, setConfirmationDialogTitle] = React.useState("");
@@ -66,7 +68,7 @@ export default function TemplateSummary() {
     },
     positiveAction: confirmationDialogPositiveAction
   }
-  
+
   const breadcrumbs = [
     <Link underline="hover" key="1" color="inherit" href='#'>
       {ROOT_BREADCRUMB}
@@ -77,17 +79,18 @@ export default function TemplateSummary() {
   ];
 
   const columns: ColumnMetadata[] = [
-    { 
-      id: 'uuid', 
-      label: 'Template ID', 
-      isHidden: true, 
-      minWidth: 100, 
-      isKeyColumn: true },
-    { 
-      id: 'templateName', 
-      label: 'Name', 
+    {
+      id: 'uuid',
+      label: 'Template ID',
+      isHidden: true,
+      minWidth: 100,
+      isKeyColumn: true
+    },
+    {
+      id: 'templateName',
+      label: 'Name',
       isSortable: true,
-      minWidth: 100 
+      minWidth: 100
     },
     {
       id: 'templateText',
@@ -215,7 +218,7 @@ export default function TemplateSummary() {
 
   React.useEffect(() => {
     loadTemplateSummaryAsync(pageIndex, pageSize, orderBy);
-  }, [pageIndex, pageSize, orderBy, restClient])
+  }, [pageIndex, pageSize, orderBy, searchText, restClient])
 
   const templates: Array<SpeedDialActionMetadata> = [
     {
@@ -234,12 +237,14 @@ export default function TemplateSummary() {
     pageIndex,
     pageSize,
     orderBy,
+    searchText,
     component: 'div',
     rowsPerPageOptions: [5, 10, 20],
-    onPageChange: (pageIndex: number, pageSize: number, orderBy: string) => {
+    onPageChange: (pageIndex: number, pageSize: number, orderBy: string, searchText: string) => {
       setPageIndex(pageIndex);
       setPageSize(pageSize);
       setOrderBy(orderBy);
+      setSearchText(searchText);
       LocalStorageService.put(pageIndexStorageKey, pageIndex)
       LocalStorageService.put(pageSizeStorageKey, pageSize)
       LocalStorageService.put(orderByStorageKey, orderBy)
@@ -251,7 +256,7 @@ export default function TemplateSummary() {
     columns,
     name: 'Overview',
     pagingOptions: pagingOptions,
-    tableContainerCssProps: {maxHeight: '100%'},
+    tableContainerCssProps: { maxHeight: '100%' },
     onRowClickCallback: (row: TemplateOverview) => navigate(`/templates/${row.templateName}`),
     pagingResult: pagingResult
   }

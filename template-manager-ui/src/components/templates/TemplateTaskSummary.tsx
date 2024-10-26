@@ -38,11 +38,13 @@ export default function TemplateTaskSummary() {
   const [processTracking, setCircleProcessOpen] = React.useState(false);
   let initialPagingResult: PagingResult = { totalElements: 0, content: [] };
   const [pagingResult, setPagingResult] = React.useState(initialPagingResult);
+
+  const [searchText, setSearchText] = React.useState("")
   const [pageIndex, setPageIndex] = React.useState(parseInt(LocalStorageService.getOrDefault(pageIndexStorageKey, 0)))
   const [pageSize, setPageSize] = React.useState(parseInt(LocalStorageService.getOrDefault(pageSizeStorageKey, 10)))
   const [orderBy, setOrderBy] = React.useState(LocalStorageService.getOrDefault(orderByStorageKey, '-startedAt'))
 
-  const restClient = React.useMemo(() =>  new RestClient(setCircleProcessOpen), [setCircleProcessOpen]);
+  const restClient = React.useMemo(() => new RestClient(setCircleProcessOpen), [setCircleProcessOpen]);
 
   const breadcrumbs = [
     <Link underline="hover" key="1" color="inherit" href='#'>
@@ -149,7 +151,7 @@ export default function TemplateTaskSummary() {
 
   React.useEffect(() => {
     loadTemplateReportSummaryAsync(pageIndex, pageSize, orderBy);
-  }, [pageIndex, pageSize, orderBy, restClient])
+  }, [pageIndex, pageSize, orderBy, searchText, restClient])
 
   const templates: Array<SpeedDialActionMetadata> = [
     {
@@ -168,12 +170,14 @@ export default function TemplateTaskSummary() {
     pageIndex,
     pageSize,
     orderBy,
+    searchText,
     component: 'div',
     rowsPerPageOptions: [5, 10, 20],
-    onPageChange: (pageIndex: number, pageSize: number, orderBy: string) => {
+    onPageChange: (pageIndex: number, pageSize: number, orderBy: string, searchText: string) => {
       setPageIndex(pageIndex);
       setPageSize(pageSize);
       setOrderBy(orderBy);
+      setSearchText(searchText);
       LocalStorageService.put(pageIndexStorageKey, pageIndex)
       LocalStorageService.put(pageSizeStorageKey, pageSize)
       LocalStorageService.put(orderByStorageKey, orderBy)
@@ -182,7 +186,7 @@ export default function TemplateTaskSummary() {
 
   let tableMetadata: TableMetadata = {
     columns,
-    tableContainerCssProps: {maxHeight: '100%'},
+    tableContainerCssProps: { maxHeight: '100%' },
     name: 'Overview',
     onRowClickCallback: (row: TemplateReportOverview) => navigate(`/tasks/${row.uuid}`),
     pagingOptions: pagingOptions,

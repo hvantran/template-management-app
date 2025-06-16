@@ -1,5 +1,5 @@
-export const TEMPLATE_BACKEND_URL: string = `${process.env.REACT_APP_TEMPLATE_MANAGER_BACKEND_URL}/template-manager/templates`
-export const TEMPLATE_REPORT_BACKEND_URL: string = `${process.env.REACT_APP_TEMPLATE_MANAGER_BACKEND_URL}/template-manager/templates/reports`
+export const TEMPLATE_BACKEND_URL: string = `${process.env.REACT_APP_TEMPLATE_MANAGER_BACKEND_URL}/template-manager-backend/templates`
+export const TEMPLATE_REPORT_BACKEND_URL: string = `${process.env.REACT_APP_TEMPLATE_MANAGER_BACKEND_URL}/template-manager-backend/templates/reports`
 
 export const ROOT_BREADCRUMB: string = 'Templates'
 

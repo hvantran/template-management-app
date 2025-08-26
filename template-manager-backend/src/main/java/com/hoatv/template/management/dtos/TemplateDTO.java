@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 @Getter
+@Setter
 @Builder
 @ToString
 @NoArgsConstructor
@@ -22,4 +23,17 @@ public class TemplateDTO {
     private Long createdAt;
 
     private Long updatedAt;
+
+    // Additional getters for backwards compatibility
+    public String getTemplateName() {
+        return templateName;
+    }
+
+    public String getTemplateText() {
+        return templateText;
+    }
+
+    public String getDataTemplateJSON() {
+        return dataTemplateJSON;
+    }
 }

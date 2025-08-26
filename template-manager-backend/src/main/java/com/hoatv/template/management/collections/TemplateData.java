@@ -1,17 +1,11 @@
 package com.hoatv.template.management.collections;
 
-import com.hoatv.template.management.callbacks.UUIDPersistable;
 import com.hoatv.template.management.services.TemplateEngineEnum;
 import lombok.*;
 import lombok.experimental.FieldNameConstants;
-import org.springframework.data.annotation.*;
-import org.springframework.data.domain.Persistable;
-import org.springframework.data.elasticsearch.annotations.DateFormat;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.Instant;
 import java.util.UUID;
 
 @Getter
@@ -21,37 +15,24 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldNameConstants
-@Document(indexName = "template-data-collection")
-public class TemplateData implements Persistable<UUID>, UUIDPersistable<UUID> {
+@Document(collection = "template-data-collection")
+public class TemplateData {
 
     @Id
-    private UUID id;
+    @Builder.Default
+    private String id = UUID.randomUUID().toString();
 
-    @Field(type = FieldType.Text)
     private String dataTemplateJSON;
 
-    @Field(type = FieldType.Keyword)
     private TemplateEngineEnum templateEngine;
 
-    @Field(type = FieldType.Keyword)
-    private UUID templateUUID;
+    private String templateUUID;
 
-    @CreatedDate
-    @Field(type = FieldType.Date, format = DateFormat.basic_date_time)
-    private Instant createdDate;
+    private long createdAt;
 
-    @CreatedBy
     private String createdBy;
 
-    @Field(type = FieldType.Date, format = DateFormat.basic_date_time)
-    @LastModifiedDate
-    private Instant lastModifiedDate;
+    private long updatedAt;
 
-    @LastModifiedBy
-    private String lastModifiedBy;
-
-    @Override
-    public boolean isNew() {
-        return id == null || (createdDate == null && createdBy == null);
-    }
+    private String updatedBy;
 }

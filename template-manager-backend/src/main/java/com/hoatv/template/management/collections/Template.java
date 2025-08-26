@@ -1,17 +1,12 @@
 package com.hoatv.template.management.collections;
 
-import com.hoatv.template.management.callbacks.UUIDPersistable;
+import com.hoatv.fwk.common.ultilities.DateTimeUtils;
 import com.hoatv.template.management.dtos.TemplateDTO;
 import lombok.*;
 import lombok.experimental.FieldNameConstants;
-import org.springframework.data.annotation.*;
-import org.springframework.data.domain.Persistable;
-import org.springframework.data.elasticsearch.annotations.DateFormat;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.Instant;
 import java.util.UUID;
 
 @Getter
@@ -21,57 +16,48 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldNameConstants
-@Document(indexName = "template-collection")
-public class Template implements Persistable<UUID>, UUIDPersistable<UUID> {
+@Document(collection = "template-collection")
+public class Template {
 
     @Id
-    private UUID id;
+    @Builder.Default
+    private String id = UUID.randomUUID().toString();
 
-    @Field(type = FieldType.Keyword)
     private String templateName;
 
-    @Field(type = FieldType.Text)
     private String templateText;
 
-    @Field(type = FieldType.Text)
     private String dataTemplateJSON;
 
-    @CreatedDate
-    @Field(type = FieldType.Date, format = DateFormat.basic_date_time)
-    private Instant createdDate;
+    private long createdAt;
 
-    @CreatedBy
     private String createdBy;
 
-    @Field(type = FieldType.Date, format = DateFormat.basic_date_time)
-    @LastModifiedDate
-    private Instant lastModifiedDate;
+    private long updatedAt;
 
-    @LastModifiedBy
-    private String lastModifiedBy;
-
-    @Override
-    public boolean isNew() {
-        return id == null || (createdDate == null && createdBy == null);
-    }
-
+    private String updatedBy;
 
     public TemplateDTO toTemplateDTO() {
         return TemplateDTO.builder()
-                .uuid(this.id.toString())
+                .uuid(this.id)
                 .templateName(this.templateName)
                 .templateText(this.templateText)
                 .dataTemplateJSON(this.dataTemplateJSON)
-                .createdAt(this.createdDate.toEpochMilli())
-                .updatedAt(this.lastModifiedDate.toEpochMilli())
+                .createdAt(this.createdAt)
+                .updatedAt(this.updatedAt)
                 .build();
     }
 
     public static Template fromTemplateDTO(TemplateDTO templateDTO) {
+        long currentTime = DateTimeUtils.getCurrentEpochTimeInMillisecond();
         return Template.builder()
                 .templateName(templateDTO.getTemplateName())
                 .templateText(templateDTO.getTemplateText())
                 .dataTemplateJSON(templateDTO.getDataTemplateJSON())
+                .createdAt(currentTime)
+                .updatedAt(currentTime)
+                .createdBy("system")
+                .updatedBy("system")
                 .build();
     }
 }

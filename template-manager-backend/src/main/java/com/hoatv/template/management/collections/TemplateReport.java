@@ -1,17 +1,11 @@
 package com.hoatv.template.management.collections;
 
-import com.hoatv.template.management.callbacks.UUIDPersistable;
 import com.hoatv.template.management.dtos.TemplateReportDTO;
 import lombok.*;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.*;
-import org.springframework.data.domain.Persistable;
-import org.springframework.data.elasticsearch.annotations.DateFormat;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.Instant;
 import java.util.UUID;
 
 @Getter
@@ -21,53 +15,37 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldNameConstants
-@Document(indexName = "template-report-collection")
-public class TemplateReport implements Persistable<UUID>, UUIDPersistable<UUID> {
-
+@Document(collection = "template-report-collection")
+public class TemplateReport {
 
     @Id
-    private UUID id;
+    @Builder.Default
+    private String id = UUID.randomUUID().toString();
 
-    @Field(type = FieldType.Keyword)
     private TemplateReportStatus status;
 
-    @Field(type = FieldType.Text)
     private String outputReportText;
 
-    @Field(type = FieldType.Long)
     private Long startedAt;
 
-    @Field(type = FieldType.Long)
     private Long endedAt;
 
     @Transient
     private String elapsedTime;
 
-    @Field(type = FieldType.Keyword)
-    private UUID templateUUID;
+    private String templateUUID;
 
-    @CreatedDate
-    @Field(type = FieldType.Date, format = DateFormat.basic_date_time)
-    private Instant createdDate;
+    private long createdAt;
 
-    @CreatedBy
     private String createdBy;
 
-    @Field(type = FieldType.Date, format = DateFormat.basic_date_time)
-    @LastModifiedDate
-    private Instant lastModifiedDate;
+    private long updatedAt;
 
-    @LastModifiedBy
-    private String lastModifiedBy;
-
-    @Override
-    public boolean isNew() {
-        return id == null || (createdDate == null && createdBy == null);
-    }
+    private String updatedBy;
 
     public TemplateReportDTO toTemplateReportDTO() {
         return TemplateReportDTO.builder()
-                .uuid(this.id.toString())
+                .uuid(this.id)
                 .elapsedTime(this.elapsedTime)
                 .status(this.status.toString())
                 .endedAt(this.endedAt)

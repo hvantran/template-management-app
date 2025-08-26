@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "/templates", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -46,7 +45,7 @@ public class TemplateManagementController {
     public ResponseEntity<Object> getAllTemplates(
             @RequestParam("pageIndex") int pageIndex,
             @RequestParam("pageSize") int pageSize) {
-        Sort defaultSorting = Sort.by(Sort.Order.desc(Template.Fields.createdDate));
+        Sort defaultSorting = Sort.by(Sort.Order.desc(Template.Fields.createdAt));
         Page<TemplateDTO> templateDTOList =
                 templateService.getAllTemplates(PageRequest.of(pageIndex, pageSize, defaultSorting));
         return ResponseEntity.ok(templateDTOList);
@@ -59,7 +58,7 @@ public class TemplateManagementController {
     }
 
     @DeleteMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> deleteTemplate(@NonNull @PathVariable("uuid") UUID templateId) {
+    public ResponseEntity<?> deleteTemplate(@NonNull @PathVariable("uuid") String templateId) {
         templateService.deleteTemplate(templateId);
         return ResponseEntity.noContent().build();
     }

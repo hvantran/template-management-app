@@ -11,7 +11,7 @@ import com.hoatv.template.management.dtos.TemplateReportDTO;
 import com.hoatv.template.management.collections.TemplateReportStatus;
 import com.hoatv.template.management.repositories.TemplateDataRepository;
 import com.hoatv.template.management.repositories.TemplateReportRepository;
-import org.springframework.data.elasticsearch.ResourceNotFoundException;
+import com.hoatv.fwk.common.exceptions.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class TemplateReportService {
@@ -37,15 +36,15 @@ public class TemplateReportService {
 
     @LoggingMonitor
     public TemplateReportDTO downloadReportByReportId(String reportId) {
-        Optional<TemplateReport> templateReportOptional = templateReportRepository.findById(UUID.fromString(reportId));
-        TemplateReport templateReport = templateReportOptional.orElseThrow(() -> new ResourceNotFoundException("Cannot find the report: " + reportId));
+        Optional<TemplateReport> templateReportOptional = templateReportRepository.findById(reportId);
+        TemplateReport templateReport = templateReportOptional.orElseThrow(() -> new EntityNotFoundException("Cannot find the report: " + reportId));
         return templateReport.toTemplateReportDTO();
     }
 
     @LoggingMonitor
     public TemplateReportDTO getTemplateReportStatus(String reportId) {
-        Optional<TemplateReport> templateReportOptional = templateReportRepository.findById(UUID.fromString(reportId));
-        TemplateReport templateReport = templateReportOptional.orElseThrow(() -> new ResourceNotFoundException("Cannot find the report: " + reportId));
+        Optional<TemplateReport> templateReportOptional = templateReportRepository.findById(reportId);
+        TemplateReport templateReport = templateReportOptional.orElseThrow(() -> new EntityNotFoundException("Cannot find the report: " + reportId));
         return TemplateReportDTO.builder().status(templateReport.getStatus().toString()).build();
     }
 
@@ -59,12 +58,21 @@ public class TemplateReportService {
                 .dataTemplateJSON(dataTemplateJson)
                 .templateEngine(templateEngineEnum)
                 .templateUUID(template.getId())
+                .createdAt(DateTimeUtils.getCurrentEpochTimeInMillisecond())
+                .updatedAt(DateTimeUtils.getCurrentEpochTimeInMillisecond())
+                .createdBy("system")
+                .updatedBy("system")
                 .build();
         templateDataRepository.save(templateData);
 
         TemplateReport templateReport = TemplateReport.builder()
                 .templateUUID(template.getId())
                 .status(TemplateReportStatus.IN_PROGRESS)
+                .startedAt(DateTimeUtils.getCurrentEpochTimeInMillisecond())
+                .createdAt(DateTimeUtils.getCurrentEpochTimeInMillisecond())
+                .updatedAt(DateTimeUtils.getCurrentEpochTimeInMillisecond())
+                .createdBy("system")
+                .updatedBy("system")
                 .build();
         templateReportRepository.save(templateReport);
 
@@ -72,6 +80,8 @@ public class TemplateReportService {
         templateReport.setOutputReportText(data);
         templateReport.setEndedAt(DateTimeUtils.getCurrentEpochTimeInMillisecond());
         templateReport.setStatus(TemplateReportStatus.COMPLETED);
+        templateReport.setUpdatedAt(DateTimeUtils.getCurrentEpochTimeInMillisecond());
+        templateReport.setUpdatedBy("system");
         templateReportRepository.save(templateReport);
         return templateReport.toTemplateReportDTO();
     }
@@ -81,7 +91,7 @@ public class TemplateReportService {
         return templateReportDetails.map(TemplateReport::toTemplateReportDTO);
     }
 
-    public void deleteReportByTemplate(UUID templateId) {
+    public void deleteReportByTemplate(String templateId) {
         List<TemplateReport> templateReports = templateReportRepository.findByTemplateUUID(templateId);
         templateReportRepository.deleteAll(templateReports);
         List<TemplateData> templateDataList = templateDataRepository.findByTemplateUUID(templateId);

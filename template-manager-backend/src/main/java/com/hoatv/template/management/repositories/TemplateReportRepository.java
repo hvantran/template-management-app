@@ -1,14 +1,11 @@
 package com.hoatv.template.management.repositories;
 
 import com.hoatv.template.management.collections.TemplateReport;
-import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
-import java.util.UUID;
 
-public interface TemplateReportRepository extends ElasticsearchRepository<TemplateReport, UUID> {
-
-
-    List<TemplateReport> findByTemplateUUID(UUID templateId);
+public interface TemplateReportRepository extends MongoRepository<TemplateReport, String> {
+    
+    List<TemplateReport> findByTemplateUUID(String templateId);
 }
-

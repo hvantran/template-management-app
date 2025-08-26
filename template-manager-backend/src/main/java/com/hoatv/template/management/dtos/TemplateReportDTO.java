@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 @Getter
+@Setter
 @Builder
 @ToString
 @NoArgsConstructor
@@ -23,5 +24,14 @@ public class TemplateReportDTO {
     private Long endedAt;
 
     private String elapsedTime;
+
+    // Additional getters for backwards compatibility
+    public String getUuid() {
+        return uuid;
+    }
+
+    public String getOutputReportText() {
+        return outputReportText;
+    }
 
 }

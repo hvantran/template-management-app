@@ -10,6 +10,7 @@ import com.hoatv.template.management.repositories.TemplateRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import com.hoatv.fwk.common.exceptions.EntityNotFoundException;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -84,9 +85,10 @@ public class TemplateService {
     }
 
     public List<TemplateDTO> searchTemplateByName(String templateName) {
+        Sort defaultSorting = Sort.by(Sort.Order.asc(Template.Fields.templateName));
         return Optional.ofNullable(templateName)
-                .map(templateRepository::findByTemplateNameContainingIgnoreCase)
-                .orElseGet(() -> StreamSupport.stream(templateRepository.findAll().spliterator(), false).toList())
+                .map(p -> templateRepository.findByTemplateNameContainingIgnoreCase(templateName, defaultSorting))
+                .orElseGet(() -> templateRepository.findAll(defaultSorting))
                 .stream().map(Template::toTemplateDTO).toList();
     }
 }

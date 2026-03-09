@@ -80,4 +80,3 @@ jobs:
       - name: Run UI tests
         working-directory: template-manager-ui
         run: yarn test --passWithNoTests --watchAll=false
-        continue-on-error: true

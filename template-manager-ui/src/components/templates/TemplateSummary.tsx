@@ -254,7 +254,7 @@ export default function TemplateSummary() {
 
   let tableMetadata: TableMetadata = {
     columns,
-    name: 'Overview',
+    name: 'Dashboard',
     pagingOptions: pagingOptions,
     tableContainerCssProps: { maxHeight: '100%' },
     onRowClickCallback: (row: TemplateOverview) => navigate(`/templates/${row.templateName}`),

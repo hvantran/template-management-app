@@ -17,8 +17,8 @@ public class CorsConfig {
                         .allowedOrigins(
                                 "http://localhost:3000",
                                 "http://localhost:3001",
-                                "http://templatemanui.local:6088",
-                                "http://actmanagerui.local:6084"
+                                "http://localhost:6088",
+                                "http://localhost:6084"
                         )
                         .allowedHeaders("*");
             }

@@ -53,33 +53,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Checkout ui-component-library
-        uses: actions/checkout@v4
-        with:
-          repository: hvantran/ui-component-library
-          path: ui-component-library
-          token: ${{ secrets.ACCESS_TOKEN }}
-
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '24'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@hvantran'
           cache: 'yarn'
           cache-dependency-path: template-manager-ui/yarn.lock
 
-      - name: Build ui-component-library
-        working-directory: ui-component-library
-        run: |
-          yarn install
-          yarn build
-          rm -rf node_modules/react node_modules/react-dom
-          TARGET_DIR="$(cd ${{ github.workspace }}/../.. && pwd)/base-platform/ui-component-library"
-          mkdir -p "$(dirname "$TARGET_DIR")"
-          ln -sfn "${{ github.workspace }}/ui-component-library" "$TARGET_DIR"
-
       - name: Install dependencies
         working-directory: template-manager-ui
-        run: yarn install --frozen-lockfile
+        run: yarn install
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
       
       - name: Setup environment
         working-directory: template-manager-ui

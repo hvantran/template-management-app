@@ -1565,8 +1565,8 @@
   resolved "https://registry.npmjs.org/@humanwhocodes/object-schema/-/object-schema-1.2.1.tgz#b520529ec21d8e5945a1851dfd1c32e94e39ff45"
   integrity sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==
 
-"@hvantran/ui-component-library@file:../../../base-platform/ui-component-library":
-  version "0.1.0"
+"@hvantran/ui-component-library@^1.0.9":
+  version "1.0.9"
   dependencies:
     "@codemirror/lang-javascript" "^6.2.2"
     "@codemirror/lang-json" "^6.0.1"

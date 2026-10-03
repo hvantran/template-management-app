@@ -1,41 +1,31 @@
-import { json } from '@codemirror/lang-json';
-import { Stack } from '@mui/material';
-
-import LinkBreadcrumd from '@mui/material/Link';
-import Typography from '@mui/material/Typography';
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { TEMPLATE_BACKEND_URL, TemplateReportMetadata } from '../AppConstants';
 import {
-  PageEntityMetadata,
-  PropType,
-  PropertyMetadata,
-  RestClient,
+  WizardCreationTemplate,
   StepMetadata,
-  onchangeStepDefault
-} from '../GenericConstants';
-import ProcessTracking from '../common/ProcessTracking';
-
-import PageEntityRender from '../renders/PageEntityRender';
-
+  PropertyMetadata,
+  PropType,
+} from '@hvantran/ui-component-library';
+import { TEMPLATE_BACKEND_URL, TemplateReportMetadata } from '../AppConstants';
+import { RestClient } from '../GenericConstants';
 
 export default function TemplateTaskCreation() {
-
   const location = useLocation();
   const navigate = useNavigate();
-  let templateName = location.state?.template.templateName || '';
-  let dataTemplateJSON = location.state?.template.dataTemplateJSON || '{}';
-  let dsiableTemplateNameProp = location.state?.template.dsiableTemplateNameProp || false;
-  let initialStepsV3: Array<StepMetadata> = []
-  const [processTracking, setCircleProcessOpen] = React.useState(false);
-  const [stepMetadatas, setStepMetadatas] = React.useState(initialStepsV3);
-  const restClient = React.useMemo(() =>  new RestClient(setCircleProcessOpen), [setCircleProcessOpen]);
 
-  let initialStepMetadatas: Array<StepMetadata> = [
+  const templateName = location.state?.template?.templateName || '';
+  const dataTemplateJSON = location.state?.template?.dataTemplateJSON || '{}';
+  const dsiableTemplateNameProp = location.state?.template?.dsiableTemplateNameProp || false;
+
+  const [activeStep, setActiveStep] = useState(0);
+  const [processTracking, setCircleProcessOpen] = useState(false);
+  const restClient = useMemo(() => new RestClient(setCircleProcessOpen), [setCircleProcessOpen]);
+
+  const [steps, setSteps] = useState<StepMetadata[]>([
     {
-      name: "templateTaskCreation",
+      name: 'templateTaskCreation',
       label: 'Template task metadata',
-      description: 'This step is used to define a template task information',
+      description: 'Define template task information and data payload',
       properties: [
         {
           propName: 'templateName',
@@ -43,130 +33,98 @@ export default function TemplateTaskCreation() {
           propValue: templateName,
           isRequired: true,
           disabled: dsiableTemplateNameProp,
-          layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4, sx: { pl: 10 } },
-          valueElementProperties: { xs: 8 },
+          colSpan: 6,
           propDescription: 'The template name',
           propType: PropType.InputText,
-          textFieldMeta: {
-            onChangeEvent: function (event: any) {
-              let propValue = event.target.value;
-              let propName = event.target.name;
-
-              setStepMetadatas(onchangeStepDefault(propName, propValue, (stepMetadata) => {
-                if (stepMetadata.name === 'templateCreation') {
-                  stepMetadata.label = propValue;
-                }
-              }));
-            }
-          }
         },
         {
           propName: 'templateEngine',
           propLabel: 'Engine processor',
           propValue: 'freemarker',
           propDefaultValue: 'freemarker',
-          layoutProperties: { xs: 6, alignItems: "center", justifyContent: "center" },
-          labelElementProperties: { xs: 4, sx: { pl: 10 } },
-          valueElementProperties: { xs: 8 },
+          colSpan: 6,
           propType: PropType.Selection,
           selectionMeta: {
-            selections: [{ label: "freemarker", value: 'freemarker' }],
-            onChangeEvent: function (event) {
-              let propValue = event.target.value;
-              let propName = event.target.name;
-              setStepMetadatas(onchangeStepDefault(propName, propValue))
-            }
-          }
+            selections: [{ label: 'freemarker', value: 'freemarker' }],
+          },
         },
         {
           propName: 'templateData',
           propLabel: 'Template data',
           propValue: dataTemplateJSON,
-          layoutProperties: { xs: 12 },
-          labelElementProperties: { xs: 2, sx: { pl: 10 } },
-          valueElementProperties: { xs: 10 },
+          colSpan: 12,
           isRequired: true,
           propType: PropType.CodeEditor,
-          codeEditorMeta:
-          {
-            codeLanguges: [json()],
-            onChangeEvent: function (propName) {
-              return (value, _) => {
-                let propValue = value;
-                setStepMetadatas(onchangeStepDefault(propName, propValue))
-              }
-            }
-          }
-        }
-      ]
+          codeEditorMeta: {
+            height: '250px',
+            codeLanguages: ['json'],
+          },
+        },
+      ],
     },
     {
-      name: "review",
+      name: 'review',
       label: 'Review',
-      description: 'This step is used to review all steps',
+      description: 'Review details and submit task execution',
       properties: [],
-      onFinishStepClick: async (currentStepMetadata: Array<StepMetadata>) => {
-        let templateMetadata: TemplateReportMetadata = getTemplateMetadataFromStepper(currentStepMetadata);
+    },
+  ]);
 
-        const requestOptions = {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain' },
-          body: templateMetadata.templateData
+  const handlePropertyChange = (stepIndex: number, propName: string, value: any) => {
+    setSteps((prevSteps) =>
+      prevSteps.map((step, idx) => {
+        if (idx !== stepIndex) return step;
+        return {
+          ...step,
+          properties: step.properties.map((prop) =>
+            prop.propName === propName ? { ...prop, propValue: value } : prop
+          ),
         };
+      })
+    );
+  };
 
-        const targetURL = `${TEMPLATE_BACKEND_URL}/${encodeURIComponent(templateMetadata.templateName)}/process-data?engine=${templateMetadata.templateEngine}`;
-        await restClient.sendRequest(requestOptions, targetURL, async (response) => {
-          let responseJSON = await response.json();
-          navigate(`/tasks/${responseJSON["reportId"]}`)
-          return undefined;
-        });
-      }
-    }
-  ]
+  const handleFinish = async (currentSteps: StepMetadata[]) => {
+    const firstStep = currentSteps[0];
+    const findProp = (name: string) =>
+      firstStep?.properties.find((p: PropertyMetadata) => p.propName === name)?.propValue;
 
-  React.useEffect(() => {
-    setStepMetadatas(initialStepMetadatas);
-  }, [])
+    const taskMetadata: TemplateReportMetadata = {
+      templateName: findProp('templateName'),
+      templateEngine: findProp('templateEngine') || 'freemarker',
+      templateData: findProp('templateData'),
+    };
 
-  const getTemplateMetadataFromStepper = (currentStepMetadata: Array<StepMetadata>) => {
-    const findStepPropertyByCondition = (stepMetadata: StepMetadata | undefined, filter: (property: PropertyMetadata) => boolean): PropertyMetadata | undefined => {
-      return stepMetadata ? stepMetadata.properties.find(filter) : undefined;
-    }
-    const getTemplateMetadata = (): TemplateReportMetadata => {
-      let templateMetadataMetadata = currentStepMetadata.at(0);
-      if (!templateMetadataMetadata) {
-        throw new Error("Missing templateMetadata definition");
-      }
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: taskMetadata.templateData,
+    };
 
-      let templateName = findStepPropertyByCondition(templateMetadataMetadata, property => property.propName.startsWith("templateName"))?.propValue;
-      let templateEngine = findStepPropertyByCondition(templateMetadataMetadata, property => property.propName.startsWith("templateEngine"))?.propValue;
-      let templateData = findStepPropertyByCondition(templateMetadataMetadata, property => property.propName.startsWith("templateData"))?.propValue;
+    const targetURL = `${TEMPLATE_BACKEND_URL}/${encodeURIComponent(taskMetadata.templateName)}/process-data?engine=${taskMetadata.templateEngine}`;
+    await restClient.sendRequest(requestOptions, targetURL, async (response) => {
+      const responseJSON = await response.json();
+      navigate(`/tasks/${responseJSON.reportId}`);
+      return undefined;
+    });
+  };
 
-      return { templateName, templateEngine, templateData }
-    }
-
-    return getTemplateMetadata();
-  }
-
-  let initialPageEntityMetdata: PageEntityMetadata = {
-    pageName: 'templatReporteMetadata-creation',
-    breadcumbsMeta: [
-      <LinkBreadcrumd underline="hover" key="1" color="inherit" href="/tasks">
-        Tasks
-      </LinkBreadcrumd>,
-      <Typography key="3" color="text.primary">new</Typography>
-    ],
-    stepMetadatas: stepMetadatas,
-    pageEntityActions: [
-    ]
-  }
-
+  const breadcrumbs = [
+    { label: 'Tasks', href: '/tasks' },
+    { label: 'New' },
+  ];
 
   return (
-    <Stack spacing={4}>
-      <PageEntityRender {...initialPageEntityMetdata} />
-      <ProcessTracking isLoading={processTracking}></ProcessTracking>
-    </Stack>
+    <WizardCreationTemplate
+      pageTitle="Create Template Task"
+      breadcrumbs={breadcrumbs}
+      steps={steps}
+      activeStep={activeStep}
+      onStepChange={setActiveStep}
+      onFinish={handleFinish}
+      onPropertyChange={handlePropertyChange}
+      onCancel={() => navigate('/tasks')}
+      loading={processTracking}
+    />
   );
 }

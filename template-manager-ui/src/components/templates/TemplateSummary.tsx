@@ -1,102 +1,105 @@
-
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import AddTaskIcon from '@mui/icons-material/AddTask';
-import DeleteIcon from '@mui/icons-material/Delete';
-import FileCopyIcon from '@mui/icons-material/FileCopy';
-import ReadMoreIcon from '@mui/icons-material/ReadMore';
-import RefreshIcon from '@mui/icons-material/Refresh';
-
-import { Stack } from '@mui/material';
-import Link from '@mui/material/Link';
-import Typography from '@mui/material/Typography';
-import { green, red } from '@mui/material/colors';
-import React from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
+  EntitySummaryTemplate,
+  ConfirmationDialog,
+  TextTruncate,
   ColumnMetadata,
-  DataTypeDisplayer,
-  DialogMetadata,
-  LocalStorageService,
-  PageEntityMetadata,
-  PagingOptionMetadata,
+  GenericActionMetadata,
+  SpeedDialActionMetadata,
   PagingResult,
+} from '@hvantran/ui-component-library';
+import { Copy, PlusCircle, Trash2, Eye, RefreshCw } from 'lucide-react';
+import {
+  DataTypeDisplayer,
+  LocalStorageService,
   RestClient,
   SnackbarMessage,
-  SpeedDialActionMetadata,
-  TableMetadata,
-  WithLink
 } from '../GenericConstants';
-import ProcessTracking from '../common/ProcessTracking';
-
-import { useNavigate } from 'react-router-dom';
 import { ROOT_BREADCRUMB, TEMPLATE_BACKEND_URL, TemplateOverview } from '../AppConstants';
 
-import ConfirmationDialog from '../common/ConfirmationDialog';
-import TextTruncate from '../common/TextTruncate';
-import PageEntityRender from '../renders/PageEntityRender';
-
-
-
-const pageIndexStorageKey = "template-manager-template-table-page-index"
-const pageSizeStorageKey = "template-manager-template-table-page-size"
-const orderByStorageKey = "template-manager-template-table-order"
+const pageIndexStorageKey = 'template-manager-template-table-page-index';
+const pageSizeStorageKey = 'template-manager-template-table-page-size';
+const orderByStorageKey = 'template-manager-template-table-order';
 
 export default function TemplateSummary() {
   const navigate = useNavigate();
-  const [processTracking, setCircleProcessOpen] = React.useState(false);
-  let initialPagingResult: PagingResult = { totalElements: 0, content: [] };
-  const [pagingResult, setPagingResult] = React.useState(initialPagingResult);
+  const [processTracking, setCircleProcessOpen] = useState(false);
+  const initialPagingResult: PagingResult<TemplateOverview> = { totalElements: 0, content: [] };
+  const [pagingResult, setPagingResult] = useState<PagingResult<TemplateOverview>>(initialPagingResult);
 
-  const [searchText, setSearchText] = React.useState("")
-  const [pageIndex, setPageIndex] = React.useState(parseInt(LocalStorageService.getOrDefault(pageIndexStorageKey, 0)))
-  const [pageSize, setPageSize] = React.useState(parseInt(LocalStorageService.getOrDefault(pageSizeStorageKey, 10)))
-  const [orderBy, setOrderBy] = React.useState(LocalStorageService.getOrDefault(orderByStorageKey, '-updatedAt'));
+  const [searchText, setSearchText] = useState('');
+  const [pageIndex, setPageIndex] = useState(parseInt(LocalStorageService.getOrDefault(pageIndexStorageKey, 0), 10));
+  const [pageSize, setPageSize] = useState(parseInt(LocalStorageService.getOrDefault(pageSizeStorageKey, 10), 10));
+  const [orderBy, setOrderBy] = useState(LocalStorageService.getOrDefault(orderByStorageKey, '-updatedAt'));
 
-  const restClient = React.useMemo(() => new RestClient(setCircleProcessOpen), [setCircleProcessOpen]);
-  const [deleteConfirmationDialogOpen, setDeleteConfirmationDialogOpen] = React.useState(false);
-  const [confirmationDialogContent, setConfirmationDialogContent] = React.useState(<p></p>);
-  const [confirmationDialogTitle, setConfirmationDialogTitle] = React.useState("");
-  const [confirmationDialogPositiveAction, setConfirmationDialogPositiveAction] = React.useState(() => () => { });
-
-  let confirmationDeleteDialogMeta: DialogMetadata = {
-    open: deleteConfirmationDialogOpen,
-    title: confirmationDialogTitle,
-    content: confirmationDialogContent,
-    positiveText: "Yes",
-    negativeText: "No",
-    negativeAction() {
-      setDeleteConfirmationDialogOpen(false);
-    },
-    positiveAction: confirmationDialogPositiveAction
-  }
+  const restClient = useMemo(() => new RestClient(setCircleProcessOpen), [setCircleProcessOpen]);
+  const [deleteConfirmationDialogOpen, setDeleteConfirmationDialogOpen] = useState(false);
+  const [confirmationDialogContent, setConfirmationDialogContent] = useState<React.ReactNode>(<p />);
+  const [confirmationDialogTitle, setConfirmationDialogTitle] = useState('');
+  const [confirmationDialogPositiveAction, setConfirmationDialogPositiveAction] = useState<() => void>(() => () => {});
 
   const breadcrumbs = [
-    <Link underline="hover" key="1" color="inherit" href='#'>
-      {ROOT_BREADCRUMB}
-    </Link>,
-    <Typography key="3" color="text.primary">
-      Summary
-    </Typography>
+    { label: ROOT_BREADCRUMB, href: '#' },
+    { label: 'Summary' },
   ];
 
-  const columns: ColumnMetadata[] = [
+  const deleteTemplate = async (templateId: string) => {
+    const requestOptions = {
+      method: 'DELETE',
+      headers: {
+        Accept: 'application/json',
+      },
+    };
+    const targetURL = `${TEMPLATE_BACKEND_URL}/${templateId}`;
+    await restClient.sendRequest(requestOptions, targetURL, () => {
+      loadTemplateSummaryAsync(pageIndex, pageSize, orderBy);
+      return undefined;
+    });
+  };
+
+  const loadTemplateSummaryAsync = async (pIndex: number, pSize: number, pOrderBy: string) => {
+    const requestOptions = {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+      },
+    };
+
+    const targetURL = `${TEMPLATE_BACKEND_URL}?pageIndex=${pIndex}&pageSize=${pSize}&orderBy=${pOrderBy}`;
+    await restClient.sendRequest(requestOptions, targetURL, async (response) => {
+      const templatePagingResult = (await response.json()) as PagingResult<TemplateOverview>;
+      setPagingResult(templatePagingResult);
+      return { message: 'Load templates successfully!!', key: new Date().getTime() } as SnackbarMessage;
+    });
+  };
+
+  useEffect(() => {
+    loadTemplateSummaryAsync(pageIndex, pageSize, orderBy);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageIndex, pageSize, orderBy, searchText, restClient]);
+
+  const columns: ColumnMetadata<TemplateOverview>[] = [
     {
       id: 'uuid',
       label: 'Template ID',
       isHidden: true,
       minWidth: 100,
-      isKeyColumn: true
+      isKeyColumn: true,
     },
     {
       id: 'templateName',
       label: 'Name',
       isSortable: true,
-      minWidth: 100
+      minWidth: 100,
     },
     {
       id: 'templateText',
       label: 'Text',
       minWidth: 100,
-      format: (value: string) => (<TextTruncate text={value} maxTextLength={100} tooltipVisiable={false} />)
+      renderCell: (row: TemplateOverview) => (
+        <TextTruncate text={row.templateText} maxTextLength={100} tooltipVisiable={false} />
+      ),
     },
     {
       id: 'createdAt',
@@ -104,7 +107,7 @@ export default function TemplateSummary() {
       isSortable: true,
       minWidth: 170,
       align: 'left',
-      format: DataTypeDisplayer.formatDate
+      format: (val: number) => DataTypeDisplayer.formatDate(val),
     },
     {
       id: 'updatedAt',
@@ -112,7 +115,7 @@ export default function TemplateSummary() {
       isSortable: true,
       minWidth: 170,
       align: 'left',
-      format: DataTypeDisplayer.formatDate
+      format: (val: number) => DataTypeDisplayer.formatDate(val),
     },
     {
       id: 'actions',
@@ -121,166 +124,127 @@ export default function TemplateSummary() {
       align: 'right',
       actions: [
         {
-          actionIcon: <FileCopyIcon />,
-          actionLabel: "Clone",
-          actionName: "cloneTemplate",
-          onClick: (row: TemplateOverview) => {
-            return () => {
-              navigate("/templates/new", {
-                state: {
-                  template: {
-                    templateName: row.templateName + "-Copy",
-                    dataTemplateJSON: row.dataTemplateJSON,
-                    templateContent: row.templateText
-                  }
-                }
-              })
-            }
-          }
-        },
-        {
-          actionIcon: <AddTaskIcon />,
-          properties: { sx: { color: green[800] } },
-          actionLabel: "Add Task",
-          actionName: "addTaskAction",
-          onClick: (row: TemplateOverview) => {
-            return () => {
-              navigate("/tasks/new", {
-                state: {
-                  template: {
-                    templateName: row.templateName,
-                    dataTemplateJSON: row.dataTemplateJSON,
-                    dsiableTemplateNameProp: true
-                  }
-                }
-              })
-            }
-          }
-        },
-        {
-          actionIcon: <DeleteIcon />,
-          properties: { sx: { color: red[800] } },
-          actionLabel: "Delete",
-          actionName: "deleteAction",
+          actionIcon: <Copy className="w-4 h-4" />,
+          actionLabel: 'Clone',
+          actionName: 'cloneTemplate',
           onClick: (row: TemplateOverview) => () => {
-            setConfirmationDialogTitle("Delete")
-            setConfirmationDialogContent(previous => <p>Are you sure you want to delete <b>{row.templateName}</b> template?</p>)
-            setConfirmationDialogPositiveAction(previous => () => {
-              deleteTemplate(row.uuid)
-              setDeleteConfirmationDialogOpen(previous => !previous)
-            })
-            setDeleteConfirmationDialogOpen(previous => !previous)
-          }
+            navigate('/templates/new', {
+              state: {
+                template: {
+                  templateName: `${row.templateName}-Copy`,
+                  dataTemplateJSON: row.dataTemplateJSON,
+                  templateContent: row.templateText,
+                },
+              },
+            });
+          },
         },
         {
-          actionIcon: <ReadMoreIcon />,
-          actionLabel: "Action details",
-          actionName: "gotoActionDetail",
-          onClick: (row: TemplateOverview) => {
-            return () => navigate(`/templates/${row.templateName}`)
-          }
-        }
-      ]
-    }
+          actionIcon: <PlusCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />,
+          actionLabel: 'Add Task',
+          actionName: 'addTaskAction',
+          onClick: (row: TemplateOverview) => () => {
+            navigate('/tasks/new', {
+              state: {
+                template: {
+                  templateName: row.templateName,
+                  dataTemplateJSON: row.dataTemplateJSON,
+                  dsiableTemplateNameProp: true,
+                },
+              },
+            });
+          },
+        },
+        {
+          actionIcon: <Trash2 className="w-4 h-4 text-rose-600 dark:text-rose-400" />,
+          actionLabel: 'Delete',
+          actionName: 'deleteAction',
+          onClick: (row: TemplateOverview) => () => {
+            setConfirmationDialogTitle('Delete');
+            setConfirmationDialogContent(
+              <p>
+                Are you sure you want to delete <b>{row.templateName}</b> template?
+              </p>
+            );
+            setConfirmationDialogPositiveAction(() => () => {
+              deleteTemplate(row.uuid);
+              setDeleteConfirmationDialogOpen(false);
+            });
+            setDeleteConfirmationDialogOpen(true);
+          },
+        },
+        {
+          actionIcon: <Eye className="w-4 h-4" />,
+          actionLabel: 'Action details',
+          actionName: 'gotoActionDetail',
+          onClick: (row: TemplateOverview) => () => {
+            navigate(`/templates/${row.templateName}`);
+          },
+        },
+      ],
+    },
   ];
 
-
-  const deleteTemplate = async (templateId: string) => {
-
-    const requestOptions = {
-      method: "DELETE",
-      headers: {
-        "Accept": "application/json"
-      }
-    }
-    const targetURL = `${TEMPLATE_BACKEND_URL}/${templateId}`;
-    await restClient.sendRequest(requestOptions, targetURL, () => {
-      loadTemplateSummaryAsync(pagingOptions.pageIndex, pagingOptions.pageSize, orderBy);
-      return undefined;
-    });
-  }
-
-  const loadTemplateSummaryAsync = async (pageIndex: number, pageSize: number, orderBy: string) => {
-    const requestOptions = {
-      method: "GET",
-      headers: {
-        "Accept": "application/json"
-      }
-    }
-
-    const targetURL = `${TEMPLATE_BACKEND_URL}?pageIndex=${pageIndex}&pageSize=${pageSize}&orderBy=${orderBy}`;
-    await restClient.sendRequest(requestOptions, targetURL, async (response) => {
-      let templatePagingResult = await response.json() as PagingResult;
-      setPagingResult(templatePagingResult);
-      return { 'message': 'Load templates successfully!!', key: new Date().getTime() } as SnackbarMessage;
-    });
-  }
-
-  React.useEffect(() => {
-    loadTemplateSummaryAsync(pageIndex, pageSize, orderBy);
-  }, [pageIndex, pageSize, orderBy, searchText, restClient])
-
-  const templates: Array<SpeedDialActionMetadata> = [
+  const floatingActions: SpeedDialActionMetadata[] = [
     {
-      actionIcon: WithLink('/templates/new', <AddCircleOutlineIcon />), actionName: 'create', actionLabel: 'New Template', properties: {
-        sx: {
-          bgcolor: green[500],
-          '&:hover': {
-            bgcolor: green[800],
-          }
-        }
-      }
-    }
+      actionIcon: <PlusCircle className="w-5 h-5" />,
+      actionName: 'create',
+      actionLabel: 'New Template',
+      onClick: () => navigate('/templates/new'),
+    },
   ];
 
-  let pagingOptions: PagingOptionMetadata = {
-    pageIndex,
-    pageSize,
-    orderBy,
-    searchText,
-    component: 'div',
-    rowsPerPageOptions: [5, 10, 20],
-    onPageChange: (pageIndex: number, pageSize: number, orderBy: string, searchText: string) => {
-      setPageIndex(pageIndex);
-      setPageSize(pageSize);
-      setOrderBy(orderBy);
-      setSearchText(searchText);
-      LocalStorageService.put(pageIndexStorageKey, pageIndex)
-      LocalStorageService.put(pageSizeStorageKey, pageSize)
-      LocalStorageService.put(orderByStorageKey, orderBy)
-      loadTemplateSummaryAsync(pageIndex, pageSize, orderBy);
-    }
-  }
-
-  let tableMetadata: TableMetadata = {
-    columns,
-    name: 'Dashboard',
-    pagingOptions: pagingOptions,
-    tableContainerCssProps: { maxHeight: '100%' },
-    onRowClickCallback: (row: TemplateOverview) => navigate(`/templates/${row.templateName}`),
-    pagingResult: pagingResult
-  }
-
-  let pageEntityMetadata: PageEntityMetadata = {
-    pageName: 'template-summary',
-    floatingActions: templates,
-    tableMetadata: tableMetadata,
-    breadcumbsMeta: breadcrumbs,
-    pageEntityActions: [
-      {
-        actionIcon: <RefreshIcon />,
-        actionLabel: "Refresh templates",
-        actionName: "refreshAction",
-        onClick: () => loadTemplateSummaryAsync(pageIndex, pageSize, orderBy)
-      }
-    ]
-  }
+  const headerActions: GenericActionMetadata[] = [
+    {
+      actionIcon: <RefreshCw className="w-4 h-4" />,
+      actionLabel: 'Refresh templates',
+      actionName: 'refreshAction',
+      onClick: () => loadTemplateSummaryAsync(pageIndex, pageSize, orderBy),
+    },
+  ];
 
   return (
-    <Stack spacing={2}>
-      <PageEntityRender {...pageEntityMetadata}></PageEntityRender>
-      <ProcessTracking isLoading={processTracking}></ProcessTracking>
-      <ConfirmationDialog {...confirmationDeleteDialogMeta}></ConfirmationDialog>
-    </Stack>
+    <>
+      <EntitySummaryTemplate<TemplateOverview>
+        pageTitle="Templates"
+        breadcrumbs={breadcrumbs}
+        headerActions={headerActions}
+        floatingActions={floatingActions}
+        tableProps={{
+          name: 'Dashboard',
+          columns,
+          keyColumn: 'uuid',
+          loading: processTracking,
+          pagingResult,
+          pagingOptions: {
+            pageIndex,
+            pageSize,
+            orderBy,
+            searchText,
+            rowsPerPageOptions: [5, 10, 20],
+            onPageChange: (pIndex, pSize, pOrderBy, pSearch) => {
+              setPageIndex(pIndex);
+              setPageSize(pSize);
+              setOrderBy(pOrderBy);
+              setSearchText(pSearch);
+              LocalStorageService.put(pageIndexStorageKey, pIndex);
+              LocalStorageService.put(pageSizeStorageKey, pSize);
+              LocalStorageService.put(orderByStorageKey, pOrderBy);
+              loadTemplateSummaryAsync(pIndex, pSize, pOrderBy);
+            },
+          },
+          onRowClickCallback: (row: TemplateOverview) => navigate(`/templates/${row.templateName}`),
+        }}
+      />
+      <ConfirmationDialog
+        open={deleteConfirmationDialogOpen}
+        title={confirmationDialogTitle}
+        content={confirmationDialogContent}
+        positiveText="Yes"
+        negativeText="No"
+        negativeAction={() => setDeleteConfirmationDialogOpen(false)}
+        positiveAction={confirmationDialogPositiveAction}
+      />
+    </>
   );
 }

@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
-  WizardCreationTemplate,
+  TemplateTaskCreationTemplate,
   StepMetadata,
   PropertyMetadata,
   PropType,
@@ -115,7 +115,7 @@ export default function TemplateTaskCreation() {
   ];
 
   return (
-    <WizardCreationTemplate
+    <TemplateTaskCreationTemplate
       pageTitle="Create Template Task"
       breadcrumbs={breadcrumbs}
       steps={steps}

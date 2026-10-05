@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import {
-  EntityDetailTemplate,
+  TemplateTaskDetailTemplate,
   PropertyMetadata,
   PropType,
   GenericActionMetadata,
@@ -86,7 +86,7 @@ export default function TemplateTaskDetails() {
   ];
 
   return (
-    <EntityDetailTemplate
+    <TemplateTaskDetailTemplate
       pageTitle={`Task ${taskId}`}
       breadcrumbs={breadcrumbs}
       headerActions={headerActions}

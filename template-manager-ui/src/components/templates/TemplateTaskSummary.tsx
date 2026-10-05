@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  EntitySummaryTemplate,
+  TemplateTaskSummaryTemplate,
   TextTruncate,
   ColumnMetadata,
   GenericActionMetadata,
@@ -143,7 +143,7 @@ export default function TemplateTaskSummary() {
   ];
 
   return (
-    <EntitySummaryTemplate<TemplateReportOverview>
+    <TemplateTaskSummaryTemplate<TemplateReportOverview>
       pageTitle="Tasks"
       breadcrumbs={breadcrumbs}
       headerActions={headerActions}

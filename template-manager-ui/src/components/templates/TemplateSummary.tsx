@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  EntitySummaryTemplate,
+  TemplateSummaryTemplate,
   ConfirmationDialog,
   TextTruncate,
   ColumnMetadata,
@@ -205,7 +205,7 @@ export default function TemplateSummary() {
 
   return (
     <>
-      <EntitySummaryTemplate<TemplateOverview>
+      <TemplateSummaryTemplate<TemplateOverview>
         pageTitle="Templates"
         breadcrumbs={breadcrumbs}
         headerActions={headerActions}

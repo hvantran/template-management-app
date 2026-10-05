@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
-  EntityDetailTemplate,
+  TemplateDetailTemplate,
   PropertyMetadata,
   PropType,
   GenericActionMetadata,
@@ -203,7 +203,7 @@ export default function TemplateDetails() {
   ];
 
   return (
-    <EntityDetailTemplate
+    <TemplateDetailTemplate
       pageTitle={templateName}
       breadcrumbs={breadcrumbs}
       headerActions={headerActions}

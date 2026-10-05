@@ -1,55 +1,50 @@
-import { Stack, ThemeProvider, CssBaseline } from '@mui/material'
-import React from 'react'
-import { Route, Routes, Navigate } from 'react-router-dom'
-import { ToastContainer } from 'react-toastify'
-import ErrorPage from './components/common/ErrorPage'
-import TemplateCreation from './components/templates/TemplateCreation'
-import TemplateDetails from './components/templates/TemplateDetail'
-import TemplateSummary from './components/templates/TemplateSummary'
-import TemplateTaskCreation from './components/templates/TemplateTaskCreation'
-import TemplateTaskDetails from './components/templates/TemplateTaskDetail'
-import TemplateTaskSummary from './components/templates/TemplateTaskSummary'
-import { DARK_THEME, DEFAULT_THEME, LocalStorageService } from './components/GenericConstants'
-import PrimarySearchAppBar from './ResponsiveAppBar'
+import React from 'react';
+import { Route, Routes, Navigate } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import { ThemeProvider, useTheme, ErrorPageTemplate } from '@hvantran/ui-component-library';
+import TemplateCreation from './components/templates/TemplateCreation';
+import TemplateDetails from './components/templates/TemplateDetail';
+import TemplateSummary from './components/templates/TemplateSummary';
+import TemplateTaskCreation from './components/templates/TemplateTaskCreation';
+import TemplateTaskDetails from './components/templates/TemplateTaskDetail';
+import TemplateTaskSummary from './components/templates/TemplateTaskSummary';
+import PrimarySearchAppBar from './ResponsiveAppBar';
 
-const selectThemeStorageKey = "template-manager-enable-dark-theme"
+function AppContent() {
+  const { resolvedTheme, toggleTheme } = useTheme();
 
-function App() {
-  const [toggleDarkMode, setToggleDarkMode] = React.useState(LocalStorageService.getOrDefault(selectThemeStorageKey, false) === 'true');
-  const switchTheme = () => {
-    setToggleDarkMode((previous) => {
-      LocalStorageService.put(selectThemeStorageKey, !previous);
-      return !previous
-    })
-  }
   return (
-    <ThemeProvider theme={!toggleDarkMode ? DEFAULT_THEME : DARK_THEME}>
-      <CssBaseline />
-      <Stack>
-        <PrimarySearchAppBar toggleDarkMode={toggleDarkMode} setToggleDarkMode={switchTheme} />
+    <div className="min-h-screen bg-surface-ground-light dark:bg-surface-ground-dark text-secondary-900 dark:text-secondary-100 font-sans">
+      <PrimarySearchAppBar
+        toggleDarkMode={resolvedTheme === 'dark'}
+        setToggleDarkMode={toggleTheme}
+      />
+      <main className="w-full">
         <Routes>
           <Route
-            path='/'
+            path="/"
             element={<Navigate to="/templates" />}
-            errorElement={<ErrorPage />}
-          >
-          </Route>
-          <Route path='/templates' element={<TemplateSummary />}></Route>
-          <Route path='/templates/new' element={<TemplateCreation />}></Route>
-          <Route
-            path='/templates/:templateName'
-            element={<TemplateDetails />}
-          ></Route>
-          <Route path='/tasks' element={<TemplateTaskSummary />}></Route>
-          <Route path='/tasks/new' element={<TemplateTaskCreation />}></Route>
-          <Route
-            path='/tasks/:taskId'
-            element={<TemplateTaskDetails />}
-          ></Route>
+            errorElement={<ErrorPageTemplate />}
+          />
+          <Route path="/templates" element={<TemplateSummary />} />
+          <Route path="/templates/new" element={<TemplateCreation />} />
+          <Route path="/templates/:templateName" element={<TemplateDetails />} />
+          <Route path="/tasks" element={<TemplateTaskSummary />} />
+          <Route path="/tasks/new" element={<TemplateTaskCreation />} />
+          <Route path="/tasks/:taskId" element={<TemplateTaskDetails />} />
         </Routes>
-      </Stack>
+      </main>
       <ToastContainer />
-    </ThemeProvider>
-  )
+    </div>
+  );
 }
-export default App
+
+function App() {
+  return (
+    <ThemeProvider defaultTheme="light" storageKey="template-manager-enable-dark-theme">
+      <AppContent />
+    </ThemeProvider>
+  );
+}
+
+export default App;
